@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231022185634_Initial")]
+    [Migration("20231023103645_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -65,7 +65,8 @@ namespace Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
 
                     b.Property<ulong?>("OwnerId")
                         .HasColumnType("numeric(20,0)");
@@ -76,7 +77,7 @@ namespace Data.Migrations
 
                     b.HasIndex("GuildId", "Name");
 
-                    b.ToTable("Tag");
+                    b.ToTable("Tags");
 
                     b.HasDiscriminator<string>("Discriminator").HasValue("Tag");
 

@@ -37,8 +37,8 @@ public abstract class CurrentContextAccessor<T>(
     /// <see cref="CanBeAccessed"/> returns false.
     /// </returns>
     public async Task<T?> GetAsync(
-        IDiscordCommandContext? context = null,
         NotFoundEntityAction notFoundAction = NotFoundEntityAction.None,
+        IDiscordCommandContext? context = null,
         CancellationToken ct = default)
     {
         context ??= commandContextAccessor.Context;

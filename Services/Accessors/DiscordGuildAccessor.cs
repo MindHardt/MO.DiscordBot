@@ -18,6 +18,7 @@ public class DiscordGuildAccessor(
     ILogger<DiscordGuildAccessor> logger)
     : CurrentContextAccessor<DiscordGuild>(commandContextAccessor, dbContext, memoryCache, logger)
 {
+    // Guilds are associated with their bot shard so we can allow this
     protected override TimeSpan CacheExpirationPeriod => TimeSpan.FromHours(1);
 
     public override bool CanBeAccessed(IDiscordCommandContext context)

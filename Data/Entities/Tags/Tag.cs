@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Data.Entities.Discord;
 using Disqord;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +12,10 @@ namespace Data.Entities.Tags;
 /// </summary>
 public abstract record Tag : IEntity<Tag, TagEntityConfiguration>
 {
+    public const int MaxNameLength = 64;
+    
     public int Id { get; set; }
+    [MaxLength(MaxNameLength)]
     public required string Name { get; set; }
 
     [NotMapped]

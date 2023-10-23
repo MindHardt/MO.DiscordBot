@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Services.Accessors;
+using Services.Tags;
 
 var builder = Host.CreateDefaultBuilder(args);
 
@@ -23,6 +24,7 @@ builder.ConfigureServices((ctx, services) =>
       .BindConfiguration("Discord");
 
    services.AddAccessors();
+   services.AddTags();
 });
 
 builder.ConfigureDiscordBot<MoDiscordBot>((host, bot) =>

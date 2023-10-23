@@ -62,7 +62,8 @@ namespace Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
 
                     b.Property<ulong?>("OwnerId")
                         .HasColumnType("numeric(20,0)");
@@ -73,7 +74,7 @@ namespace Data.Migrations
 
                     b.HasIndex("GuildId", "Name");
 
-                    b.ToTable("Tag");
+                    b.ToTable("Tags");
 
                     b.HasDiscriminator<string>("Discriminator").HasValue("Tag");
 

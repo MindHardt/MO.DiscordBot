@@ -6,7 +6,8 @@ namespace Data.Entities.Tags;
 
 public record MessageTag : Tag, IEntity<MessageTag, MessageTagEntityConfiguration>
 {
-    [MaxLength(Disqord.Discord.Limits.Message.MaxContentLength)]
+    public const int MaxContentLength = Disqord.Discord.Limits.Message.MaxContentLength;
+    [MaxLength(MaxContentLength)]
     public required string Content { get; set; }
 
     public override string Text => Content;
