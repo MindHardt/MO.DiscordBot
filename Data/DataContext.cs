@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Data;
 
-public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
+public class DataContext(DbContextOptions<DataContext> options) : DbContext(options)
 {
     public DbSet<Tag> Tags => Set<Tag>();
     public DbSet<DiscordUser> Users => Set<DiscordUser>();

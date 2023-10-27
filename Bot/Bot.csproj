@@ -16,8 +16,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Disqord" Version="1.0.0-alpha3" />
-      <PackageReference Include="Disqord.Bot" Version="1.0.0-alpha3" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0-rc.2.23480.1">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -27,8 +25,8 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Application\Application.csproj" />
       <ProjectReference Include="..\Data\Data.csproj" />
-      <ProjectReference Include="..\Services\Services.csproj" />
     </ItemGroup>
 
     <ItemGroup>

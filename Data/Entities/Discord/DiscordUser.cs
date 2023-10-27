@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using Data.Entities.Tags;
 using Disqord;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +12,7 @@ public record DiscordUser : IEntity<DiscordUser, DiscordUserEntityConfiguration>
 
     public AccessLevel Access { get; set; }
 
-    public List<Tag> Tags { get; set; } = new();
+    public List<Tag> Tags { get; set; } = null!;
 
     public enum AccessLevel : byte
     {

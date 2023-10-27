@@ -8,15 +8,11 @@
 
     <ItemGroup>
       <PackageReference Include="Disqord.Bot" Version="1.0.0-alpha5.56" />
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0-rc.2.23479.6" />
+      <PackageReference Include="MediatR" Version="12.1.1" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\Data\Data.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Tags\" />
     </ItemGroup>
 
 </Project>

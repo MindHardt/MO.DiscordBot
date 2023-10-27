@@ -1,7 +1,7 @@
 ﻿using Data.Entities.Discord;
 using Data.Entities.Tags;
 
-namespace Services.Tags;
+namespace Application.Discord.Tags;
 
 /// <summary>
 /// A class used to create all types of <see cref="Tag"/>s.

@@ -6,16 +6,26 @@ using Qmmands;
 namespace Bot.Commands;
 
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)]
-public class BasicApplicationCommandsModule : DiscordApplicationGuildModuleBase
+public class BasicCommands : DiscordApplicationGuildModuleBase
 {
-    [SlashCommand("ping")]
+    [SlashCommand("пинг")]
+    [Description("Проверка задержки бота")]
     public IResult Ping()
     {
-        return Response($"Pong!");
+        var latency = DateTimeOffset.Now - Context.Interaction.CreatedAt();
+        var embed = new LocalEmbed()
+            .WithTitle("Pong!")
+            .WithFields(new LocalEmbedField
+            {
+                Name = "⏱️ задержка",
+                Value = Markdown.Code($"{latency.Milliseconds} мс")
+            });
+        return Response(embed);
     }
 
     [UserCommand("Инфо")]
     [SlashCommand("инфо")]
+    [Description("Информация о пользователе и его аватар")]
     public IResult Info(IUser user)
     {
         var embed = new LocalEmbed

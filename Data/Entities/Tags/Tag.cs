@@ -13,11 +13,14 @@ namespace Data.Entities.Tags;
 public abstract record Tag : IEntity<Tag, TagEntityConfiguration>
 {
     public const int MaxNameLength = 64;
-    
+
     public int Id { get; set; }
     [MaxLength(MaxNameLength)]
     public required string Name { get; set; }
 
+    /// <summary>
+    /// Contains a text of this tag, regardless of its implementation type.
+    /// </summary>
     [NotMapped]
     public abstract string Text { get; }
 

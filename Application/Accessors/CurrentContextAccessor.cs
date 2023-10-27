@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
-namespace Services.Accessors;
+namespace Application.Accessors;
 
 /// <summary>
 /// A general abstraction above something being fetched from
@@ -12,16 +12,17 @@ namespace Services.Accessors;
 /// </summary>
 /// <param name="commandContextAccessor"></param>
 /// <param name="dbContext"></param>
-public abstract class CurrentContextAccessor<T>(
+public abstract class CurrentContextAccessor<TEntity, TKey>(
     ICommandContextAccessor commandContextAccessor,
-    ApplicationDbContext dbContext,
+    DataContext dbContext,
     IMemoryCache memoryCache,
-    ILogger<CurrentContextAccessor<T>> logger)
-    where T: class
+    ILogger logger)
+    where TEntity: class
+    where TKey: notnull
 {
     /// <summary>
-    /// Gets current <typeparamref name="T"/>.
-    /// The value is cached for the lifetime of <see cref="CurrentContextAccessor{TEntity}"/>
+    /// Gets current <typeparamref name="TEntity"/>.
+    /// The value is cached for the lifetime of <see cref="CurrentContextAccessor{T, TKey}"/>
     /// so the consecutive calls will not lead to additional DB calls.
     /// </summary>
     /// <param name="context">
@@ -31,12 +32,12 @@ public abstract class CurrentContextAccessor<T>(
     /// <param name="notFoundAction">Specifies behaviour if entity is not found in the database.</param>
     /// <param name="ct"></param>
     /// <returns>
-    /// The found or created <typeparamref name="T"/> or
+    /// The found or created <typeparamref name="TEntity"/> or
     /// <see langword="null"/> if user is not found and
     /// <paramref name="notFoundAction"/> doesn't allow creating one or if
     /// <see cref="CanBeAccessed"/> returns false.
     /// </returns>
-    public async Task<T?> GetAsync(
+    public Task<TEntity?> GetAsync(
         NotFoundEntityAction notFoundAction = NotFoundEntityAction.None,
         IDiscordCommandContext? context = null,
         CancellationToken ct = default)
@@ -45,18 +46,40 @@ public abstract class CurrentContextAccessor<T>(
 
         if (CanBeAccessed(context) is false)
         {
-            logger.LogDebug("Cannot access {Type} for command {Command}", typeof(T).Name, context.Command?.Name);
-            return null;
+            logger.LogDebug("Cannot access {Type} for command {Command}", typeof(TEntity).Name, context.Command?.Name);
+            return Task.FromResult<TEntity?>(null);
         }
 
-        var cacheKey = GetCacheKey(context);
-        if (memoryCache.TryGetValue(cacheKey, out T? entity))
+        var key = GetKey(context);
+        return GetAsync(key, notFoundAction, ct);
+    }
+
+    /// <summary>
+    /// Gets <see cref="TEntity"/> associated with <paramref name="key"/>.
+    /// The value is cached for the lifetime of <see cref="CurrentContextAccessor{T, TKey}"/>
+    /// so the consecutive calls will not lead to additional DB calls.
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="notFoundAction">Specifies behaviour if entity is not found in the database.</param>
+    /// <param name="ct"></param>
+    /// <returns>
+    /// The found or created <typeparamref name="TEntity"/> or
+    /// <see langword="null"/> if user is not found and
+    /// <paramref name="notFoundAction"/> doesn't allow creating one.
+    /// </returns>
+    public async Task<TEntity?> GetAsync(
+        TKey key,
+        NotFoundEntityAction notFoundAction = NotFoundEntityAction.None,
+        CancellationToken ct = default)
+    {
+        var cacheKey = GetCacheKey(key);
+        if (memoryCache.TryGetValue(cacheKey, out TEntity? entity))
         {
             logger.LogDebug("Entity with cache key {Key} retrieved from cache", cacheKey);
             return entity;
         }
 
-        entity = await FetchAsync(context, dbContext, ct);
+        entity = await FetchAsync(key, dbContext, ct);
         SetCache(cacheKey, entity);
         if (entity is not null)
         {
@@ -70,7 +93,7 @@ public abstract class CurrentContextAccessor<T>(
             return null;
         }
 
-        entity = CreateDefault(context);
+        entity = CreateDefault(key);
         logger.LogDebug("Entity with cache key {Key} created", cacheKey);
         dbContext.Add(entity);
         if (notFoundAction is not NotFoundEntityAction.Save)
@@ -85,14 +108,21 @@ public abstract class CurrentContextAccessor<T>(
     }
 
     /// <summary>
-    /// Defines whether this <see cref="CurrentContextAccessor{T}"/> can retrieve its data.
+    /// Defines whether this <see cref="CurrentContextAccessor{TEntity, TKey}"/> can retrieve its data.
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
     public abstract bool CanBeAccessed(IDiscordCommandContext context);
 
     /// <summary>
-    /// Defines how long <typeparamref name="T"/> should be persisted in <see cref="IMemoryCache"/>.
+    /// Gets <typeparamref name="TKey"/> used to retrieve data from <paramref name="context"/>.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    public abstract TKey GetKey(IDiscordCommandContext context);
+
+    /// <summary>
+    /// Defines how long <typeparamref name="TEntity"/> should be persisted in <see cref="IMemoryCache"/>.
     /// </summary>
     protected virtual TimeSpan CacheExpirationPeriod => TimeSpan.FromMinutes(5);
 
@@ -100,32 +130,33 @@ public abstract class CurrentContextAccessor<T>(
     /// Gets current entity key.
     /// </summary>
     /// <returns></returns>
-    protected abstract string GetContextKey(IDiscordCommandContext context);
+    protected virtual string GetUniqueCacheKey(TKey key)
+        => key.ToString()!;
 
     /// <summary>
-    /// Fetches <typeparamref name="T"/> from the database.
+    /// Fetches <typeparamref name="TEntity"/> from the database.
     /// </summary>
-    /// <param name="context"></param>
+    /// <param name="key"></param>
     /// <param name="dbContext"></param>
     /// <param name="ct"></param>
     /// <returns></returns>
-    protected abstract Task<T?> FetchAsync(IDiscordCommandContext context, ApplicationDbContext dbContext, CancellationToken ct);
+    protected abstract Task<TEntity?> FetchAsync(TKey key, DataContext dbContext, CancellationToken ct);
 
     /// <summary>
-    /// Creates default <typeparamref name="T"/> for specified context.
+    /// Creates default <typeparamref name="TEntity"/> for specified context.
     /// </summary>
     /// <returns></returns>
-    protected abstract T CreateDefault(IDiscordCommandContext context);
-    
-    private string GetCacheKey(IDiscordCommandContext context)
-        => $"{typeof(T).FullName}_{GetContextKey(context)}";
+    protected abstract TEntity CreateDefault(TKey key);
 
-    private void SetCache(string cacheKey, T? entity)
+    private string GetCacheKey(TKey key)
+        => $"{typeof(TEntity).FullName}_{GetUniqueCacheKey(key)}";
+
+    private void SetCache(string cacheKey, TEntity? entity)
         => memoryCache.Set(cacheKey, entity, CacheExpirationPeriod);
 }
 
 /// <summary>
-/// Specifies behaviour of <see cref="CurrentContextAccessor{T}"/> if entity is not found.
+/// Specifies behaviour of <see cref="CurrentContextAccessor{TEntity, TKey}"/> if entity is not found.
 /// </summary>
 public enum NotFoundEntityAction
 {
@@ -134,7 +165,7 @@ public enum NotFoundEntityAction
     /// </summary>
     None,
     /// <summary>
-    /// User is created and <see cref="DbSet{TEntity}.Add"/>ed to the <see cref="ApplicationDbContext"/>,
+    /// User is created and <see cref="DbSet{TEntity}.Add"/>ed to the <see cref="DataContext"/>,
     /// but <see cref="DbContext.SaveChangesAsync(CancellationToken)"/> is not called and value is not cached.
     /// </summary>
     Create,

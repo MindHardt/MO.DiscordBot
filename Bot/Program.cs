@@ -1,4 +1,6 @@
-﻿using Bot;
+﻿using Application.Accessors;
+using Application.Discord;
+using Bot;
 using Bot.Options;
 using Data;
 using Disqord.Bot.Hosting;
@@ -7,8 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Services.Accessors;
-using Services.Tags;
 
 var builder = Host.CreateDefaultBuilder(args);
 
@@ -17,7 +17,7 @@ builder.ConfigureServices((ctx, services) =>
    var connStr = ctx.Configuration.GetConnectionString("DefaultConnection")
       ?? throw new InvalidOperationException("Connection string DefaultConnection not found");
 
-   services.AddDbContextFactory<ApplicationDbContext>(options =>
+   services.AddDbContextFactory<DataContext>(options =>
       options.UseNpgsql(connStr));
 
    services.AddOptions<DiscordOptions>()
@@ -25,6 +25,7 @@ builder.ConfigureServices((ctx, services) =>
 
    services.AddAccessors();
    services.AddTags();
+   services.AddGuilds();
 });
 
 builder.ConfigureDiscordBot<MoDiscordBot>((host, bot) =>
@@ -39,7 +40,7 @@ var host = builder.Build();
 
 using (var scope = host.Services.CreateScope())
 {
-   await scope.ServiceProvider.GetRequiredService<ApplicationDbContext>().Database.MigrateAsync();
+   await scope.ServiceProvider.GetRequiredService<DataContext>().Database.MigrateAsync();
 }
 
 await host.RunAsync();
