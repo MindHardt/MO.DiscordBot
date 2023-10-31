@@ -9,8 +9,18 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Serilog;
+using Serilog.Events;
+using Serilog.Sinks.SystemConsole.Themes;
 
 var builder = Host.CreateDefaultBuilder(args);
+
+builder.UseSerilog((ctx, logger) =>
+{
+   logger
+      .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug, theme: AnsiConsoleTheme.Code)
+      .WriteTo.File("Logs", rollingInterval: RollingInterval.Day);
+});
 
 builder.ConfigureServices((ctx, services) =>
 {
