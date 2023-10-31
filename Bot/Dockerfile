@@ -6,6 +6,7 @@ WORKDIR /src
 COPY ["Bot/Bot.csproj", "Bot/"]
 COPY ["Data/Data.csproj", "Data/"]
 COPY ["Application/Application.csproj", "Application/"]
+COPY ["NuGet.Config", ""]
 RUN dotnet restore "Bot/Bot.csproj"
 COPY . .
 WORKDIR "/src/Bot"
