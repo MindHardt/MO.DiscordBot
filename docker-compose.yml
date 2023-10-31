@@ -1,0 +1,12 @@
+﻿version: '3.4'
+services:
+  bot:
+    image: mo.discordbot
+    container_name: mo.discordbot
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Bot/Dockerfile
+    environment:
+      - ConnectionStrings__DefaultConnection=
+      - Discord__Token=

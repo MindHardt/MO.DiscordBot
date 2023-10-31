@@ -8,9 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Application\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B1CB8829-794A-4782-9575-59CB0160B62B}"
 	ProjectSection(SolutionItems) = preProject
-		.dockerignore = .dockerignore
-		Dockerfile = Dockerfile
 		NuGet.Config = NuGet.Config
+		docker-compose.yml = docker-compose.yml
 	EndProjectSection
 EndProject
 Global
