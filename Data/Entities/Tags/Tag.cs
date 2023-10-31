@@ -13,6 +13,7 @@ namespace Data.Entities.Tags;
 public abstract record Tag : IEntity<Tag, TagEntityConfiguration>
 {
     public const int MaxNameLength = 64;
+    public const DiscordUser.AccessLevel TagsEditorAccessLevel = DiscordUser.AccessLevel.Helper;
 
     public int Id { get; set; }
     [MaxLength(MaxNameLength)]
@@ -29,6 +30,14 @@ public abstract record Tag : IEntity<Tag, TagEntityConfiguration>
 
     public Snowflake? OwnerId { get; set; }
     public DiscordUser? Owner { get; set; }
+
+    /// <summary>
+    /// Defines whether <paramref name="user"/> can edit this <see cref="Tag"/>.
+    /// </summary>
+    /// <param name="user"></param>
+    /// <returns></returns>
+    public bool CanBeEditedBy(DiscordUser user) =>
+        OwnerId == user.Id || user.Access >= TagsEditorAccessLevel;
 }
 
 public class TagEntityConfiguration : IEntityTypeConfiguration<Tag>

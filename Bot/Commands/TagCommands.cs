@@ -96,7 +96,7 @@ public class TagCommands : DiscordApplicationGuildModuleBase
         [Maximum(Tag.MaxNameLength)] [Name("новое-имя"), Description("Новое имя тега")]
         string newName)
     {
-        var request = new RenameTagRequest(Context.GuildId, tagName, newName);
+        var request = new RenameTagRequest(Context.GuildId, Context.AuthorId, tagName, newName);
         var result = await Context.Services
             .GetRequiredService<RenameTagHandler>()
             .HandleAsync(request, Context.CancellationToken)
@@ -107,8 +107,26 @@ public class TagCommands : DiscordApplicationGuildModuleBase
             : Qmmands.Results.Failure(result.Exception.Message);
     }
 
+    [SlashCommand("удалить")]
+    [Description("Удаляет тег, к которому у вас есть доступ")]
+    public async ValueTask<IResult> DeleteTag(
+        [Name("имя"), Description("Имя удаляемого тега")]
+        string tagName)
+    {
+        var request = new DeleteTagRequest(Context.GuildId, Context.AuthorId, tagName);
+        var result = await Context.Services
+            .GetRequiredService<DeleteTagHandler>()
+            .HandleAsync(request, Context.CancellationToken)
+            .AsResult();
+
+        return result.Success
+            ? Response("Успешно удалил тег ✅")
+            : Qmmands.Results.Failure(result.Exception.Message);
+    }
+
     [AutoComplete("переименовать")]
     [AutoComplete("отправить")]
+    [AutoComplete("удалить")]
     public async ValueTask TagNameAutocomplete(
         [Name("имя")] AutoComplete<string> tagName)
     {
@@ -139,8 +157,11 @@ public class MessageTagCommands : DiscordApplicationGuildModuleBase
         var name = Context.Services
             .GetRequiredService<TagNameService>()
             .GenerateRandomTagName();
+        var attachmentLines = (message as IUserMessage)?.Attachments
+            .Select(x => $"\n{x.Url}") ?? Array.Empty<string>();
+        var content = message.Content + string.Concat(attachmentLines);
 
-        var request = new CreateTagRequest(Context.AuthorId, Context.GuildId, name, message.Content);
+        var request = new CreateTagRequest(Context.AuthorId, Context.GuildId, name, content);
         var result = await Context.Services
             .GetRequiredService<CreateTagHandler>()
             .HandleAsync(request, Context.CancellationToken)
