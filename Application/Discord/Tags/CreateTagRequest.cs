@@ -12,28 +12,26 @@ public record CreateTagRequest(
     string TagName,
     string Content) : IRequest<MessageTag>;
 
-public class CreateTagRequestHandler(
+public class CreateTagHandler(
     TagFactory tagFactory,
     DiscordUserAccessor discordUserAccessor,
     DiscordGuildAccessor discordGuildAccessor,
     DataContext dataContext,
     TagNameService tagNameService)
-    : IRequestHandler<CreateTagRequest, MessageTag>
+    : IRequestHandler<CreateTagRequest>
 {
-    public async Task<MessageTag> HandleAsync(CreateTagRequest request, CancellationToken ct)
+    public async Task HandleAsync(CreateTagRequest request, CancellationToken ct)
     {
         if (tagNameService.ValidateTagName(request.TagName) is false)
         {
             throw new ArgumentException("Имя тега недопустимо!");
         }
 
-        var user = await discordUserAccessor.GetAsync(request.AuthorId, NotFoundEntityAction.Create, ct);
-        var guild = await discordGuildAccessor.GetAsync(request.GuildId, NotFoundEntityAction.Create, ct);
+        var user = await discordUserAccessor.GetAsync(request.AuthorId, NotFoundEntityAction.Create, false, ct);
+        var guild = await discordGuildAccessor.GetAsync(request.GuildId, NotFoundEntityAction.Create, false, ct);
 
         var tag = tagFactory.CreateMessageTag(request.TagName, request.Content, user, guild);
         dataContext.Tags.Add(tag);
         await dataContext.SaveChangesAsync(ct);
-
-        return tag;
     }
 }

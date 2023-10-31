@@ -1,4 +1,5 @@
-﻿using Bot.Attributes;
+﻿using System.Diagnostics.CodeAnalysis;
+using Bot.Attributes;
 using Data.Entities.Discord;
 using Disqord.Bot.Commands.Application;
 using Microsoft.Extensions.Caching.Memory;
@@ -9,6 +10,7 @@ namespace Bot.Commands;
 
 [SlashGroup("админ")]
 [RequireAuthorAccess(DiscordUser.AccessLevel.Administrator)]
+[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)]
 public class AdministratorCommands : DiscordApplicationGuildModuleBase
 {
     private const string AdminUserOnly = "Только для администраторов бота";

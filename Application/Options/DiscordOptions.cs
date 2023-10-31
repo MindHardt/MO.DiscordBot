@@ -1,6 +1,6 @@
 ﻿using Disqord;
 
-namespace Bot.Options;
+namespace Application.Options;
 
 public record DiscordOptions
 {

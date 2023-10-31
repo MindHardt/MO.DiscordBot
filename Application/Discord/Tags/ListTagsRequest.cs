@@ -13,7 +13,7 @@ public record ListTagsRequest(
     int Limit)
     : IRequest<IReadOnlyCollection<TagOverview>>;
 
-public class ListTagsRequestHandler(
+public class ListTagsHandler(
     DataContext dataContext) 
     : IRequestHandler<ListTagsRequest, IReadOnlyCollection<TagOverview>>
 {

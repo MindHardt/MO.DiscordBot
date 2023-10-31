@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
+using Bogus;
 using Data.Entities.Discord;
 using Data.Entities.Tags;
 using Microsoft.Extensions.Caching.Memory;
@@ -12,13 +13,13 @@ namespace Application.Discord.Tags;
 /// and finding tag names in messages.
 /// </summary>
 /// <param name="memoryCache"></param>
-public partial class TagNameService(IMemoryCache memoryCache)
+public partial class TagNameService(IMemoryCache memoryCache, Faker faker)
 {
     [StringSyntax(StringSyntaxAttribute.Regex)]
-    public const string TagNameAllowedCharacters = @"[\p{L}_.,\-]";
+    public const string TagNameAllowedCharacters = @"[\p{L}_\.,\-]";
 
     [StringSyntax(StringSyntaxAttribute.Regex)]
-    public const string TagNameRegexString = $"{TagNameAllowedCharacters}+";
+    public const string TagNameRegexString = $"^{TagNameAllowedCharacters}+$";
 
     [StringSyntax(StringSyntaxAttribute.Regex)]
     public const string GuildPrefixRegexString = "[\\S]+";
@@ -64,6 +65,22 @@ public partial class TagNameService(IMemoryCache memoryCache)
         return match.Groups["NAME"].Value is { Length: > 0 } tagName
             ? tagName
             : null;
+    }
+
+    /// <summary>
+    /// Generates random tag name.
+    /// </summary>
+    /// <returns></returns>
+    public string GenerateRandomTagName()
+    {
+        while (true)
+        {
+            var tagName = string.Join('-', faker.Lorem.Words()).ToLower();
+            if (ValidateTagName(tagName))
+            {
+                return tagName;
+            }
+        }
     }
 
     private static Regex CreateRegex(string prefix) =>

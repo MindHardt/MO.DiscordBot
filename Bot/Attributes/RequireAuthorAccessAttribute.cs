@@ -1,4 +1,5 @@
 ﻿using Application.Accessors;
+using Bogus;
 using Data.Entities.Discord;
 using Disqord.Bot.Commands;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,7 +16,7 @@ public class RequireAuthorAccessAttribute(DiscordUser.AccessLevel accessLevel) :
     public override async ValueTask<IResult> CheckAsync(IDiscordCommandContext context)
     {
         var userAccessor = context.Services.GetRequiredService<DiscordUserAccessor>();
-        var user = await userAccessor.GetAsync(NotFoundEntityAction.None, context, context.CancellationToken);
+        var user = await userAccessor.GetAsync(NotFoundEntityAction.None, context, allowCache: true, context.CancellationToken);
 
         return user?.Access >= accessLevel
             ? Results.Success

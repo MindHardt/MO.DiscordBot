@@ -23,7 +23,7 @@ public class SetTagPrefixHandler(
             throw new ArgumentException("Этот префикс недопустим!");
         }
 
-        var guild = await discordGuildAccessor.GetAsync(request.GuildId, NotFoundEntityAction.Save, ct);
+        var guild = await discordGuildAccessor.GetAsync(request.GuildId, NotFoundEntityAction.Save, false, ct);
         guild!.TagPrefix = request.NewPrefix;
 
         dataContext.Guilds.Update(guild);

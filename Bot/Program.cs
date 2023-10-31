@@ -1,7 +1,7 @@
 ﻿using Application.Accessors;
 using Application.Discord;
+using Application.Options;
 using Bot;
-using Bot.Options;
 using Data;
 using Disqord.Bot.Hosting;
 using Disqord.Gateway;
@@ -20,12 +20,12 @@ builder.ConfigureServices((ctx, services) =>
    services.AddDbContextFactory<DataContext>(options =>
       options.UseNpgsql(connStr));
 
-   services.AddOptions<DiscordOptions>()
-      .BindConfiguration("Discord");
+   services.AddOptions<DiscordOptions>().BindConfiguration("Discord");
+   services.AddOptions<FakerOptions>().BindConfiguration("Faker");
 
    services.AddAccessors();
    services.AddTags();
-   services.AddGuilds();
+   services.AddHandlers();
 });
 
 builder.ConfigureDiscordBot<MoDiscordBot>((host, bot) =>

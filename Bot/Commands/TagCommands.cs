@@ -8,7 +8,6 @@ using Disqord;
 using Disqord.Bot.Commands.Application;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
-using Results = Qmmands.Results;
 
 namespace Bot.Commands;
 
@@ -28,13 +27,13 @@ public class TagCommands : DiscordApplicationGuildModuleBase
     {
         var request = new CreateTagRequest(Context.AuthorId, Context.GuildId, name, content);
         var result = await Context.Services
-            .GetRequiredService<CreateTagRequestHandler>()
+            .GetRequiredService<CreateTagHandler>()
             .HandleAsync(request, Context.CancellationToken)
             .AsResult();
 
         return result.Success
             ? Response("✅")
-            : Results.Failure(result.Exception.Message);
+            : Qmmands.Results.Failure(result.Exception.Message);
     }
 
     [SlashCommand("отправить")]
@@ -46,13 +45,13 @@ public class TagCommands : DiscordApplicationGuildModuleBase
     {
         var request = new GetTagRequest(Context.GuildId, tagName);
         var result = await Context.Services
-            .GetRequiredService<GetTagRequestHandler>()
+            .GetRequiredService<GetTagHandler>()
             .HandleAsync(request, Context.CancellationToken)
             .AsResult();
 
         return result.Success
             ? Response(result.Value.Text)
-            : Results.Failure(result.Exception.Message);
+            : Qmmands.Results.Failure(result.Exception.Message);
     }
 
     [SlashCommand("список")]
@@ -64,13 +63,13 @@ public class TagCommands : DiscordApplicationGuildModuleBase
     {
         var request = new ListTagsRequest(Context.GuildId, prompt, Discord.Limits.Message.Embed.MaxFieldAmount);
         var result = await Context.Services
-            .GetRequiredService<ListTagsRequestHandler>()
+            .GetRequiredService<ListTagsHandler>()
             .HandleAsync(request, Context.CancellationToken)
             .AsResult();
 
         if (result.Success is false)
         {
-            return Results.Failure(result.Exception.Message);
+            return Qmmands.Results.Failure(result.Exception.Message);
         }
 
         var embeds = result.Value
@@ -87,5 +86,68 @@ public class TagCommands : DiscordApplicationGuildModuleBase
             });
 
         return Response(new LocalEmbed().WithTitle($"Теги по запросу {prompt}").WithFields(embeds));
+    }
+
+    [SlashCommand("переименовать")]
+    [Description("Переименовывает тег")]
+    public async ValueTask<IResult> RenameTag(
+        [Maximum(Tag.MaxNameLength)] [Name("имя"), Description("Имя искомого тега")]
+        string tagName,
+        [Maximum(Tag.MaxNameLength)] [Name("новое-имя"), Description("Новое имя тега")]
+        string newName)
+    {
+        var request = new RenameTagRequest(Context.GuildId, tagName, newName);
+        var result = await Context.Services
+            .GetRequiredService<RenameTagHandler>()
+            .HandleAsync(request, Context.CancellationToken)
+            .AsResult();
+
+        return result.Success
+            ? Response($"Переименовал тег {Markdown.Code(newName)}")
+            : Qmmands.Results.Failure(result.Exception.Message);
+    }
+
+    [AutoComplete("переименовать")]
+    [AutoComplete("отправить")]
+    public async ValueTask TagNameAutocomplete(
+        [Name("имя")] AutoComplete<string> tagName)
+    {
+        if (tagName.IsFocused is false)
+        {
+            return;
+        }
+
+        const int limit = Discord.Limits.ApplicationCommand.MaxOptionAmount;
+        var request = new ListTagsRequest(Context.GuildId, tagName.RawArgument!, limit);
+        var result = await Context.Services
+            .GetRequiredService<ListTagsHandler>()
+            .HandleAsync(request, Context.CancellationToken)
+            .AsResult();
+
+        if (result.Success)
+        {
+            tagName.Choices.AddRange(result.Value.Select(x => x.Name));
+        }
+    }
+}
+
+public class MessageTagCommands : DiscordApplicationGuildModuleBase
+{
+    [MessageCommand("Создать тег")]
+    public async ValueTask<IResult> CreateTag(IMessage message)
+    {
+        var name = Context.Services
+            .GetRequiredService<TagNameService>()
+            .GenerateRandomTagName();
+
+        var request = new CreateTagRequest(Context.AuthorId, Context.GuildId, name, message.Content);
+        var result = await Context.Services
+            .GetRequiredService<CreateTagHandler>()
+            .HandleAsync(request, Context.CancellationToken)
+            .AsResult();
+
+        return result.Success
+            ? Response($"Создал тег {Markdown.Code(name)}")
+            : Qmmands.Results.Failure(result.Exception.Message);
     }
 }

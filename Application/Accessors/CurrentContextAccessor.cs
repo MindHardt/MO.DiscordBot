@@ -25,11 +25,15 @@ public abstract class CurrentContextAccessor<TEntity, TKey>(
     /// The value is cached for the lifetime of <see cref="CurrentContextAccessor{T, TKey}"/>
     /// so the consecutive calls will not lead to additional DB calls.
     /// </summary>
+    /// <param name="notFoundAction">Specifies behaviour if entity is not found in the database.</param>
     /// <param name="context">
     /// The command context used for retrieval.
     /// If not specified, defaults to <see cref="ICommandContextAccessor.Context"/>.
     /// </param>
-    /// <param name="notFoundAction">Specifies behaviour if entity is not found in the database.</param>
+    /// <param name="allowCache">
+    /// Defines whether method should check for cached values.
+    /// It is advised to allow cache only for readonly operations.
+    /// </param>
     /// <param name="ct"></param>
     /// <returns>
     /// The found or created <typeparamref name="TEntity"/> or
@@ -40,6 +44,7 @@ public abstract class CurrentContextAccessor<TEntity, TKey>(
     public Task<TEntity?> GetAsync(
         NotFoundEntityAction notFoundAction = NotFoundEntityAction.None,
         IDiscordCommandContext? context = null,
+        bool allowCache = true,
         CancellationToken ct = default)
     {
         context ??= commandContextAccessor.Context;
@@ -51,7 +56,7 @@ public abstract class CurrentContextAccessor<TEntity, TKey>(
         }
 
         var key = GetKey(context);
-        return GetAsync(key, notFoundAction, ct);
+        return GetAsync(key, notFoundAction, allowCache, ct);
     }
 
     /// <summary>
@@ -61,6 +66,10 @@ public abstract class CurrentContextAccessor<TEntity, TKey>(
     /// </summary>
     /// <param name="key"></param>
     /// <param name="notFoundAction">Specifies behaviour if entity is not found in the database.</param>
+    /// <param name="allowCache">
+    /// Defines whether method should check for cached values.
+    /// It is advised to allow cache only for readonly operations.
+    /// </param>
     /// <param name="ct"></param>
     /// <returns>
     /// The found or created <typeparamref name="TEntity"/> or
@@ -70,10 +79,11 @@ public abstract class CurrentContextAccessor<TEntity, TKey>(
     public async Task<TEntity?> GetAsync(
         TKey key,
         NotFoundEntityAction notFoundAction = NotFoundEntityAction.None,
+        bool allowCache = true,
         CancellationToken ct = default)
     {
         var cacheKey = GetCacheKey(key);
-        if (memoryCache.TryGetValue(cacheKey, out TEntity? entity))
+        if (allowCache && memoryCache.TryGetValue(cacheKey, out TEntity? entity))
         {
             logger.LogDebug("Entity with cache key {Key} retrieved from cache", cacheKey);
             return entity;

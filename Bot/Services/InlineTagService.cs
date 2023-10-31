@@ -22,7 +22,7 @@ public class InlineTagService(ILogger<InlineTagService> logger) : DiscordBotServ
 
     protected override async ValueTask OnMessageReceived(BotMessageReceivedEventArgs e)
     {
-        if (e.GuildId is null)
+        if (e.GuildId is null || Bot.GetUser(e.AuthorId)?.IsBot is not false)
         {
             return;
         }
@@ -45,7 +45,7 @@ public class InlineTagService(ILogger<InlineTagService> logger) : DiscordBotServ
 
         var getTagRequest = new GetTagRequest(e.GuildId.Value, tagName);
         var tagResult = await scope.ServiceProvider
-            .GetRequiredService<GetTagRequestHandler>()
+            .GetRequiredService<GetTagHandler>()
             .HandleAsync(getTagRequest, CancellationToken.None)
             .AsResult();
 

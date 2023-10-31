@@ -12,7 +12,7 @@ public record GetTagRequest(
     string Prompt)
     : IRequest<Tag>;
 
-public class GetTagRequestHandler(DataContext dataContext) : IRequestHandler<GetTagRequest, Tag>
+public class GetTagHandler(DataContext dataContext) : IRequestHandler<GetTagRequest, Tag>
 {
     public async Task<Tag> HandleAsync(GetTagRequest request, CancellationToken ct)
     {
