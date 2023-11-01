@@ -1,4 +1,8 @@
 ﻿version: '3.4'
+
+volumes: 
+  seq-data:
+
 services:
   bot:
     image: mo.discordbot
@@ -9,3 +13,23 @@ services:
       dockerfile: Bot/Dockerfile
     env_file:
       - .env
+    environment:
+      - Serilog__WriteTo__3__Name=Seq
+      - Serilog__WriteTo__3__Args__serverUrl=http://seq:5341
+    depends_on: 
+      - seq
+  
+  seq:
+    image: datalust/seq
+    container_name: seq
+    restart: unless-stopped
+    environment:
+      - ACCEPT_EULA=Y
+      
+    volumes:
+      - seq-data:/data
+    
+    ports:
+      - "9997:80"
+    expose:
+      - "5341:5341"
