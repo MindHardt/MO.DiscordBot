@@ -72,20 +72,24 @@ public class TagCommands : DiscordApplicationGuildModuleBase
             return Qmmands.Results.Failure(result.Exception.Message);
         }
 
-        var embeds = result.Value
-            .Select((tag, i) => new LocalEmbedField
-            {
-                Name = $"{i + 1}. {tag.Name}",
-                Value = Markdown.Code(tag.TagKind switch
+        var tagLines = result.Value
+            .Select((tag, i) => (
+                Number: i + 1,
+                tag.Name,
+                TagKind: tag.TagKind switch
                 {
                     TagKind.Message => "📧",
                     TagKind.Alias => "🔗",
                     _ => throw new ArgumentOutOfRangeException()
-                }),
-                IsInline = true
-            });
+                }))
+            .Select(x => $"{x.TagKind}| {x.Number}. {x.Name}");
 
-        return Response(new LocalEmbed().WithTitle($"Теги по запросу {prompt}").WithFields(embeds));
+        var embed = new LocalEmbed
+        {
+            Title = $"Теги по запросу [{prompt}]",
+            Description = Markdown.CodeBlock(string.Join('\n', tagLines)),
+        };
+        return Response(embed);
     }
 
     [SlashCommand("переименовать")]
@@ -124,9 +128,30 @@ public class TagCommands : DiscordApplicationGuildModuleBase
             : Qmmands.Results.Failure(result.Exception.Message);
     }
 
+    [SlashCommand("синоним")]
+    [Description("Создает синоним для тега, позволяя вызывать его по новому имени.")]
+    public async ValueTask<IResult> CreateTagAlias(
+        [Name("имя"), Description("Имя удаляемого тега")]
+        string tagName,
+        [Maximum(Tag.MaxNameLength)]
+        [Name("синоним"), Description("Имя синонима тега")]
+        string aliasName)
+    {
+        var request = new CreateTagAliasRequest(Context.GuildId, Context.AuthorId, tagName, aliasName);
+        var result = await Context.Services
+            .GetRequiredService<CreateTagAliasHandler>()
+            .HandleAsync(request, Context.CancellationToken)
+            .AsResult();
+
+        return result.Success
+            ? Response($"Создал синоним {Markdown.Code(aliasName)}")
+            : Qmmands.Results.Failure(result.Exception.Message);
+    }
+
     [AutoComplete("переименовать")]
     [AutoComplete("отправить")]
     [AutoComplete("удалить")]
+    [AutoComplete("синоним")]
     public async ValueTask TagNameAutocomplete(
         [Name("имя")] AutoComplete<string> tagName)
     {

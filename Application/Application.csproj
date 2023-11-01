@@ -17,4 +17,19 @@
       <ProjectReference Include="..\Data\Data.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <EmbeddedResource Update="Discord\Tags\TagResources.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>TagResources.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Discord\Tags\TagResources.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>TagResources.resx</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
 </Project>

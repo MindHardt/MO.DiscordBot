@@ -34,11 +34,33 @@ public partial class TagNameService(IMemoryCache memoryCache, Faker faker)
     /// Validates <see cref="Tag"/> name.
     /// </summary>
     /// <param name="tagName"></param>
+    /// <exception cref="ArgumentException">If <paramref name="tagName"/> is not a valid tag name.</exception>
+    public void ValidateTagName(string tagName)
+    {
+        if (TagNameValid(tagName) is false)
+            throw new ArgumentException(string.Format(TagResources.TagNameInvalidErrorMessage, tagName));
+    }
+
+    /// <summary>
+    /// Validates <see cref="Tag"/> name.
+    /// </summary>
+    /// <param name="tagName"></param>
     /// <returns>
     /// <see langword="true"/> if <paramref name="tagName"/> is valid, otherwise <see langword="false"/>.
     /// </returns>
-    public bool ValidateTagName(string tagName)
+    public bool TagNameValid(string tagName)
         => tagName is { Length: <= Tag.MaxNameLength } && TagNameRegex().IsMatch(tagName);
+
+    /// <summary>
+    /// Validates <see cref="DiscordGuild.TagPrefix"/>.
+    /// </summary>
+    /// <param name="prefix"></param>
+    /// <exception cref="ArgumentException">If <paramref name="prefix"/> is not a valid guild prefix.</exception>
+    public void ValidateGuildPrefix(string prefix)
+    {
+        if (GuildPrefixValid(prefix) is false)
+            throw new ArgumentException(string.Format(TagResources.GuildPrefixInvalidErrorMessage, prefix));
+    }
 
     /// <summary>
     /// Validates <see cref="DiscordGuild.TagPrefix"/>.
@@ -47,7 +69,7 @@ public partial class TagNameService(IMemoryCache memoryCache, Faker faker)
     /// <returns>
     /// <see langword="true"/> if <paramref name="prefix"/> is valid, otherwise <see langword="false"/>.
     /// </returns>
-    public bool ValidateGuildPrefix(string prefix)
+    public bool GuildPrefixValid(string prefix)
         => prefix is { Length: <= DiscordGuild.MaxTagPrefixLength } && GuildPrefixRegex().IsMatch(prefix);
 
     /// <summary>
@@ -76,7 +98,7 @@ public partial class TagNameService(IMemoryCache memoryCache, Faker faker)
         while (true)
         {
             var tagName = string.Join('-', faker.Lorem.Words()).ToLower();
-            if (ValidateTagName(tagName))
+            if (TagNameValid(tagName))
             {
                 return tagName;
             }

@@ -20,10 +20,7 @@ public class RenameTagHandler(
 {
     public async Task HandleAsync(RenameTagRequest request, CancellationToken ct = default)
     {
-        if (tagNameService.ValidateTagName(request.NewTagName) is false)
-        {
-            throw new ArgumentException($"Имя тега {request.NewTagName} недопустимо");
-        }
+        tagNameService.ValidateTagName(request.NewTagName);
 
         var tagRequest = new GetTagRequest(request.GuildId, request.TagName);
         var tag = await getTagHandler.HandleAsync(tagRequest, ct);

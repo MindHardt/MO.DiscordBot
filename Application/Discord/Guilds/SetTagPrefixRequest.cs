@@ -17,11 +17,7 @@ public class SetTagPrefixHandler(
 {
     public async Task HandleAsync(SetTagPrefixRequest request, CancellationToken ct = default)
     {
-        var prefixValid = tagNameService.ValidateGuildPrefix(request.NewPrefix);
-        if (prefixValid is false)
-        {
-            throw new ArgumentException("Этот префикс недопустим!");
-        }
+        tagNameService.ValidateGuildPrefix(request.NewPrefix);
 
         var guild = await discordGuildAccessor.GetAsync(request.GuildId, NotFoundEntityAction.Save, false, ct);
         guild!.TagPrefix = request.NewPrefix;

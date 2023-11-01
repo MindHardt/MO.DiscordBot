@@ -22,10 +22,7 @@ public class CreateTagHandler(
 {
     public async Task HandleAsync(CreateTagRequest request, CancellationToken ct)
     {
-        if (tagNameService.ValidateTagName(request.TagName) is false)
-        {
-            throw new ArgumentException("Имя тега недопустимо!");
-        }
+        tagNameService.ValidateTagName(request.TagName);
 
         var user = await discordUserAccessor.GetAsync(request.AuthorId, NotFoundEntityAction.Create, false, ct);
         var guild = await discordGuildAccessor.GetAsync(request.GuildId, NotFoundEntityAction.Create, false, ct);
