@@ -10,15 +10,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
-using Serilog.Events;
-using Serilog.Sinks.SystemConsole.Themes;
 
 var builder = Host.CreateDefaultBuilder(args);
 
-builder.UseSerilog((ctx, logger) =>
+builder.UseSerilog((_, logger) =>
 {
    logger
-      .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug, theme: AnsiConsoleTheme.Code)
+      .WriteTo.Console()
       .WriteTo.File("Logs", rollingInterval: RollingInterval.Day);
 });
 

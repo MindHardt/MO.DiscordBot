@@ -16,4 +16,19 @@
       <Folder Include="Migrations\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <EmbeddedResource Update="Entities\Discord\AccessLevelNames.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>AccessLevelNames.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Entities\Discord\AccessLevelNames.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>AccessLevelNames.resx</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
 </Project>

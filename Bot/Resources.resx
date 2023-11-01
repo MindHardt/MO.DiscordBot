@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<root>
+    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+        <xsd:element name="root" msdata:IsDataSet="true">
+            
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <data name="Id" xml:space="preserve">
+        <value>🔑 ID</value>
+    </data>
+    <data name="TagCount" xml:space="preserve">
+        <value>🔢 Тегов</value>
+    </data>
+    <data name="TagPrefix" xml:space="preserve">
+        <value>🔣 Префикс тегов</value>
+    </data>
+    <data name="InlineTagsEnabled" xml:space="preserve">
+        <value>🔍 Строчные теги</value>
+    </data>
+    <data name="Url" xml:space="preserve">
+        <value>🔗 Ссылка</value>
+    </data>
+    <data name="Bot" xml:space="preserve">
+        <value>🤖 Бот</value>
+    </data>
+    <data name="Sound" xml:space="preserve">
+        <value>🎧 Звук</value>
+    </data>
+    <data name="Microphone" xml:space="preserve">
+        <value>🎙️ Микро</value>
+    </data>
+    <data name="AccessLevel" xml:space="preserve">
+        <value>💳 Доступ</value>
+    </data>
+</root>

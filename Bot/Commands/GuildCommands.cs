@@ -2,15 +2,33 @@
 using Application.Discord.Guilds;
 using Bot.Attributes;
 using Data.Entities.Discord;
+using Disqord;
 using Disqord.Bot.Commands.Application;
+using Disqord.Gateway;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
+using Qommon;
 
 namespace Bot.Commands;
 
 [SlashGroup("сервер")]
 public class GuildCommands : DiscordApplicationGuildModuleBase
 {
+    [SlashCommand("инфо")]
+    [Description("Информация о сервере")]
+    public async ValueTask<IResult> Info()
+    {
+        var request = new GetGuildInfoRequest(Context.GuildId);
+        var result = await Context.Services
+            .GetRequiredService<GetGuildInfoHandler>()
+            .HandleAsync(request, Context.CancellationToken)
+            .AsResult();
+
+        return result.Success
+            ? Response(DiscordFormatter.CreateGuildInfoEmbed(result.Value, Bot.GetGuild(Context.GuildId)!))
+            : Qmmands.Results.Failure(result.Exception.Message);
+    }
+
     [SlashGroup("настроить")]
     public class ConfigureModule : DiscordApplicationGuildModuleBase
     {
