@@ -13,12 +13,7 @@ using Serilog;
 
 var builder = Host.CreateDefaultBuilder(args);
 
-builder.UseSerilog((_, logger) =>
-{
-   logger
-      .WriteTo.Console()
-      .WriteTo.File("Logs", rollingInterval: RollingInterval.Day);
-});
+builder.UseSerilog((ctx, logger) => logger.ReadFrom.Configuration(ctx.Configuration));
 
 builder.ConfigureServices((ctx, services) =>
 {
