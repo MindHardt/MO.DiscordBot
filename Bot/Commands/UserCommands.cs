@@ -12,11 +12,9 @@ namespace Bot.Commands;
 [SlashGroup("юзер")]
 public class UserCommands : DiscordApplicationGuildModuleBase
 {
-    [SlashCommand("инфо")]
-    [Description("Получаем инфу о пользователе")]
+    [SlashCommand("инфо"), Description("Получаем инфу о пользователе")]
     public async ValueTask<IResult> Info(
-        [Name("пользователь")]
-        [Description("Тот чью инфу получаем")]
+        [Name("пользователь"), Description("Тот чью инфу получаем")]
         IUser user)
     {
         var request = new GetUserInfoRequest(user.Id);
@@ -30,18 +28,14 @@ public class UserCommands : DiscordApplicationGuildModuleBase
             : Qmmands.Results.Failure(result.Exception.Message);
     }
 
-    [SlashCommand("уровень-доступа")]
-    [Description("Меняет уровень доступа юзера. Только для админов.")]
+    [SlashCommand("уровень-доступа"), Description("Меняет уровень доступа юзера. Только для админов.")]
     [RequireAuthorAccess(DiscordUser.AccessLevel.Administrator)]
     public async ValueTask<IResult> SetAccessLevel(
-        [Name("пользователь")] 
-        [Description("Цель.")]
+        [Name("пользователь"), Description("Цель.")]
         IUser user,
-        [Name("уровень")]
-        [Description("Уровень доступа который выставляем.")]
+        [Name("уровень"), Description("Уровень доступа который выставляем.")]
         DiscordUser.AccessLevel accessLevel,
-        [Name("уведомить")]
-        [Description("Нужно ли упоминать пользователя")]
+        [Name("уведомить"), Description("Нужно ли упоминать пользователя")]
         [Choice("✅ да", "true"), Choice("❌ нет", "false")]
         string notification = "false")
     {

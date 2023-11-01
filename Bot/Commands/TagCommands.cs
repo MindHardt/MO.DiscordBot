@@ -14,15 +14,12 @@ namespace Bot.Commands;
 [SlashGroup("тег")]
 public class TagCommands : DiscordApplicationGuildModuleBase
 {
-    [SlashCommand("создать")]
-    [Description("Создает тег и вашего текста")]
+    [SlashCommand("создать"), Description("Создает тег и вашего текста")]
     [RequireAuthorAccess(DiscordUser.AccessLevel.Advanced)]
     public async ValueTask<IResult> CreateTag(
-        [Maximum(Tag.MaxNameLength)]
-        [Name("имя"), Description("имя нового тега")]
+        [Maximum(Tag.MaxNameLength), Name("имя"), Description("имя нового тега")]
         string name,
-        [Maximum(MessageTag.MaxContentLength)]
-        [Name("содержимое"), Description("текст нового тега")]
+        [Maximum(MessageTag.MaxContentLength), Name("содержимое"), Description("текст нового тега")]
         string content)
     {
         var request = new CreateTagRequest(Context.AuthorId, Context.GuildId, name, content);
@@ -36,11 +33,9 @@ public class TagCommands : DiscordApplicationGuildModuleBase
             : Qmmands.Results.Failure(result.Exception.Message);
     }
 
-    [SlashCommand("отправить")]
-    [Description("Отправляет тег с заданным именем")]
+    [SlashCommand("отправить"), Description("Отправляет тег с заданным именем")]
     public async ValueTask<IResult> SendTag(
-        [Maximum(Tag.MaxNameLength)]
-        [Name("имя"), Description("имя искомого тега")]
+        [Maximum(Tag.MaxNameLength), Name("имя"), Description("имя искомого тега")]
         string tagName)
     {
         var request = new GetTagRequest(Context.GuildId, tagName);
@@ -54,11 +49,9 @@ public class TagCommands : DiscordApplicationGuildModuleBase
             : Qmmands.Results.Failure(result.Exception.Message);
     }
 
-    [SlashCommand("список")]
-    [Description("Выводит список тегов, доступных на этом сервере")]
+    [SlashCommand("список"), Description("Выводит список тегов, доступных на этом сервере")]
     public async ValueTask<IResult> ListTags(
-        [Maximum(Tag.MaxNameLength)]
-        [Name("запрос"), Description("часть имени тега")]
+        [Maximum(Tag.MaxNameLength), Name("запрос"), Description("часть имени тега")]
         string prompt = "")
     {
         var request = new ListTagsRequest(Context.GuildId, prompt, Discord.Limits.Message.Embed.MaxFieldAmount);
@@ -92,12 +85,11 @@ public class TagCommands : DiscordApplicationGuildModuleBase
         return Response(embed);
     }
 
-    [SlashCommand("переименовать")]
-    [Description("Переименовывает тег")]
+    [SlashCommand("переименовать"), Description("Переименовывает тег")]
     public async ValueTask<IResult> RenameTag(
-        [Maximum(Tag.MaxNameLength)] [Name("имя"), Description("Имя искомого тега")]
+        [Maximum(Tag.MaxNameLength), Name("имя"), Description("Имя искомого тега")]
         string tagName,
-        [Maximum(Tag.MaxNameLength)] [Name("новое-имя"), Description("Новое имя тега")]
+        [Maximum(Tag.MaxNameLength), Name("новое-имя"), Description("Новое имя тега")]
         string newName)
     {
         var request = new RenameTagRequest(Context.GuildId, Context.AuthorId, tagName, newName);
@@ -111,8 +103,7 @@ public class TagCommands : DiscordApplicationGuildModuleBase
             : Qmmands.Results.Failure(result.Exception.Message);
     }
 
-    [SlashCommand("удалить")]
-    [Description("Удаляет тег, к которому у вас есть доступ")]
+    [SlashCommand("удалить"), Description("Удаляет тег, к которому у вас есть доступ")]
     public async ValueTask<IResult> DeleteTag(
         [Name("имя"), Description("Имя удаляемого тега")]
         string tagName)
@@ -128,8 +119,7 @@ public class TagCommands : DiscordApplicationGuildModuleBase
             : Qmmands.Results.Failure(result.Exception.Message);
     }
 
-    [SlashCommand("синоним")]
-    [Description("Создает синоним для тега, позволяя вызывать его по новому имени.")]
+    [SlashCommand("синоним"), Description("Создает синоним для тега, позволяя вызывать его по новому имени.")]
     public async ValueTask<IResult> CreateTagAlias(
         [Name("имя"), Description("Имя удаляемого тега")]
         string tagName,
@@ -161,7 +151,7 @@ public class TagCommands : DiscordApplicationGuildModuleBase
         }
 
         const int limit = Discord.Limits.ApplicationCommand.MaxOptionAmount;
-        var request = new ListTagsRequest(Context.GuildId, tagName.RawArgument!, limit);
+        var request = new ListTagsRequest(Context.GuildId, tagName.RawArgument, limit);
         var result = await Context.Services
             .GetRequiredService<ListTagsHandler>()
             .HandleAsync(request, Context.CancellationToken)

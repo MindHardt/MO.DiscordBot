@@ -16,7 +16,7 @@ namespace Application.Discord.Tags;
 public partial class TagNameService(IMemoryCache memoryCache, Faker faker)
 {
     [StringSyntax(StringSyntaxAttribute.Regex)]
-    public const string TagNameAllowedCharacters = @"[\p{L}_\.,\-]";
+    public const string TagNameAllowedCharacters = @"[\p{L}\d_\.,\-]";
 
     [StringSyntax(StringSyntaxAttribute.Regex)]
     public const string TagNameRegexString = $"^{TagNameAllowedCharacters}+$";

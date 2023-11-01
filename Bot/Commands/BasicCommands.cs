@@ -8,8 +8,7 @@ namespace Bot.Commands;
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)]
 public class BasicCommands : DiscordApplicationGuildModuleBase
 {
-    [SlashCommand("пинг")]
-    [Description("Проверка задержки бота")]
+    [SlashCommand("пинг"), Description("Проверка задержки бота")]
     public IResult Ping()
     {
         var latency = DateTimeOffset.Now - Context.Interaction.CreatedAt();

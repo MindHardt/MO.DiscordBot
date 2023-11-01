@@ -14,8 +14,7 @@ namespace Bot.Commands;
 [SlashGroup("сервер")]
 public class GuildCommands : DiscordApplicationGuildModuleBase
 {
-    [SlashCommand("инфо")]
-    [Description("Информация о сервере")]
+    [SlashCommand("инфо"), Description("Информация о сервере")]
     public async ValueTask<IResult> Info()
     {
         var request = new GetGuildInfoRequest(Context.GuildId);
@@ -32,11 +31,9 @@ public class GuildCommands : DiscordApplicationGuildModuleBase
     [SlashGroup("настроить")]
     public class ConfigureModule : DiscordApplicationGuildModuleBase
     {
-        [SlashCommand("префикс-тегов")]
-        [Description("Управляет префиксом строчных тегов")]
+        [SlashCommand("префикс-тегов"), Description("Управляет префиксом строчных тегов")]
         public async ValueTask<IResult> TagPrefix(
-            [Name("префикс")]
-            [Description("Новый префикс тегов")]
+            [Name("префикс"), Description("Новый префикс тегов")]
             string newPrefix)
         {
             var request = new SetTagPrefixRequest(Context.GuildId, newPrefix);
@@ -50,12 +47,10 @@ public class GuildCommands : DiscordApplicationGuildModuleBase
                 : Qmmands.Results.Failure(result.Exception.Message);
         }
 
-        [SlashCommand("строчные-теги")]
-        [Description("Управляет строчными тегами (которые пишутся в сообщении через префикс)")]
+        [SlashCommand("строчные-теги"), Description("Управляет строчными тегами (которые пишутся в сообщении через префикс)")]
         [RequireAuthorAccess(DiscordUser.AccessLevel.Helper)]
         public async ValueTask<IResult> InlineTags(
-            [Name("состояние")]
-            [Description("Включены ли строчные теги")]
+            [Name("состояние"), Description("Включены ли строчные теги")]
             [Choice("✅ включены", "true"), Choice("❌ выключены", "false")]
             string enabled)
         {
