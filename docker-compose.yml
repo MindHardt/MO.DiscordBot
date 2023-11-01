@@ -7,6 +7,5 @@ services:
     build:
       context: .
       dockerfile: Bot/Dockerfile
-    environment:
-      - ConnectionStrings__DefaultConnection=
-      - Discord__Token=
+    env_file:
+      - .env
