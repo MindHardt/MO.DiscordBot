@@ -6,6 +6,9 @@
 # dotenv files
 .env
 
+# disqord commands cache
+Bot/application-commands/
+
 # User-specific files
 *.rsuser
 *.suo
