@@ -3,7 +3,6 @@ using Application.Options;
 using Bogus;
 using Data.Entities.Tags;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
 namespace Application.Discord;
@@ -22,7 +21,7 @@ public static class DependencyInjection
             return new Faker(options.Locale);
         })
         .AddScoped<TagFactory>()
-        .AddScoped<TagNameService>();
+        .AddScoped<TagService>();
 
     /// <summary>
     /// Adds all types that implement either

@@ -12,20 +12,18 @@ public record CreateTagAliasRequest(
     string AliasName);
 
 public class CreateTagAliasHandler(
-    GetTagHandler getTagHandler,
     DiscordUserAccessor discordUserAccessor,
     DiscordGuildAccessor discordGuildAccessor,
     TagFactory tagFactory,
-    TagNameService tagNameService,
+    TagService tagService,
     DataContext dataContext)
     : IRequestHandler<CreateTagAliasRequest>
 {
     public async Task HandleAsync(CreateTagAliasRequest request, CancellationToken ct = default)
     {
-        tagNameService.ValidateTagName(request.AliasName);
+        tagService.ValidateTagName(request.AliasName);
 
-        var getTagRequest = new GetTagRequest(request.GuildId, request.OriginalTagName);
-        var tag = await getTagHandler.HandleAsync(getTagRequest, ct);
+        var tag = await tagService.FindSimilarAsync(request.GuildId, request.OriginalTagName, ct);
 
         var messageTag = tag switch
         {
@@ -36,6 +34,12 @@ public class CreateTagAliasHandler(
         if (messageTag is null)
         {
             throw new ArgumentException("Ошибка получения тега");
+        }
+
+        var existingTag = await tagService.FindExactAsync(request.GuildId, request.AliasName, ct);
+        if (existingTag is not null)
+        {
+            throw new ArgumentException($"Имя тега {request.AliasName} занято.");
         }
 
         var user = await discordUserAccessor.GetAsync(request.UserId, NotFoundEntityAction.Create, false, ct);

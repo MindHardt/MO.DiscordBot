@@ -90,9 +90,14 @@ public class TagCommands : DiscordApplicationGuildModuleBase
         [Maximum(Tag.MaxNameLength), Name("имя"), Description("Имя искомого тега")]
         string tagName,
         [Maximum(Tag.MaxNameLength), Name("новое-имя"), Description("Новое имя тега")]
-        string newName)
+        string newName,
+        [Name("заменить"), Description("Нужно ли заменять тег при конфликте.")]
+        [Choice("✅ да", "true"), Choice("❌ нет", "false")]
+        string replace = "false")
     {
-        var request = new RenameTagRequest(Context.GuildId, Context.AuthorId, tagName, newName);
+        var allowReplace = bool.Parse(replace);
+
+        var request = new RenameTagRequest(Context.GuildId, Context.AuthorId, tagName, newName, allowReplace);
         var result = await Context.Services
             .GetRequiredService<RenameTagHandler>()
             .HandleAsync(request, Context.CancellationToken)
@@ -170,7 +175,7 @@ public class MessageTagCommands : DiscordApplicationGuildModuleBase
     public async ValueTask<IResult> CreateTag(IMessage message)
     {
         var name = Context.Services
-            .GetRequiredService<TagNameService>()
+            .GetRequiredService<TagService>()
             .GenerateRandomTagName();
         var attachmentLines = (message as IUserMessage)?.Attachments
             .Select(x => $"\n{x.Url}") ?? Array.Empty<string>();

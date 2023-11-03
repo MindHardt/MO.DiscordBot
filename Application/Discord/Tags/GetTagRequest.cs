@@ -1,9 +1,6 @@
-﻿using Data;
-using Data.Entities.Tags;
-using Data.Queries;
+﻿using Data.Entities.Tags;
 using Disqord;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace Application.Discord.Tags;
 
@@ -12,23 +9,11 @@ public record GetTagRequest(
     string Prompt)
     : IRequest<Tag>;
 
-public class GetTagHandler(DataContext dataContext) : IRequestHandler<GetTagRequest, Tag>
+public class GetTagHandler(TagService tagService) : IRequestHandler<GetTagRequest, Tag>
 {
     public async Task<Tag> HandleAsync(GetTagRequest request, CancellationToken ct)
     {
-        var results = await dataContext.Tags
-            .WithText()
-            .VisibleIn(request.GuildId)
-            .SearchByName(request.Prompt)
-            .OrderBy(x => x.Name)
-            .Take(2)
-            .ToArrayAsync(ct);
-
-        if (results.Length != 1)
-        {
-            throw new ArgumentException("Тег не найден");
-        }
-
-        return results[0];
+        return await tagService.FindSimilarAsync(request.GuildId, request.Prompt, ct)
+            ?? throw new ArgumentException("Тег не найден");;
     }
 }

@@ -10,14 +10,14 @@ public record SetTagPrefixRequest(
     string NewPrefix);
 
 public class SetTagPrefixHandler(
-    TagNameService tagNameService,
+    TagService tagService,
     DiscordGuildAccessor discordGuildAccessor,
     DataContext dataContext)
     : IRequestHandler<SetTagPrefixRequest>
 {
     public async Task HandleAsync(SetTagPrefixRequest request, CancellationToken ct = default)
     {
-        tagNameService.ValidateGuildPrefix(request.NewPrefix);
+        tagService.ValidateGuildPrefix(request.NewPrefix);
 
         var guild = await discordGuildAccessor.GetAsync(request.GuildId, NotFoundEntityAction.Save, false, ct);
         guild!.TagPrefix = request.NewPrefix;

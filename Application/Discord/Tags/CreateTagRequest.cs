@@ -17,12 +17,12 @@ public class CreateTagHandler(
     DiscordUserAccessor discordUserAccessor,
     DiscordGuildAccessor discordGuildAccessor,
     DataContext dataContext,
-    TagNameService tagNameService)
+    TagService tagService)
     : IRequestHandler<CreateTagRequest>
 {
     public async Task HandleAsync(CreateTagRequest request, CancellationToken ct)
     {
-        tagNameService.ValidateTagName(request.TagName);
+        tagService.ValidateTagName(request.TagName);
 
         var user = await discordUserAccessor.GetAsync(request.AuthorId, NotFoundEntityAction.Create, false, ct);
         var guild = await discordGuildAccessor.GetAsync(request.GuildId, NotFoundEntityAction.Create, false, ct);

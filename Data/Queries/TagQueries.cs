@@ -32,6 +32,7 @@ public static class TagQueries
     /// <param name="query"></param>
     /// <param name="prompt"></param>
     /// <returns></returns>
+    /// <remarks>The search is case-insensitive.</remarks>
     public static IQueryable<Tag> SearchByName(this IQueryable<Tag> query, string prompt) => query
         .Where(x => EF.Functions.ILike(x.Name, $"%{prompt}%"));
 
@@ -40,8 +41,18 @@ public static class TagQueries
     /// </summary>
     /// <param name="query"></param>
     /// <returns></returns>
-    public static IQueryable<Tag> WithText(this IQueryable<Tag> query) => query
+    public static IQueryable<Tag> IncludeText(this IQueryable<Tag> query) => query
         .Include(x => ((AliasTag)x).ReferencedTag);
+
+    /// <summary>
+    /// Searches for <see cref="Tag"/> that have name equal to <paramref name="tagName"/>.
+    /// </summary>
+    /// <param name="query"></param>
+    /// <param name="tagName"></param>
+    /// <returns></returns>
+    /// <remarks>The search is case-insensitive.</remarks>
+    public static IQueryable<Tag> WithExactName(this IQueryable<Tag> query, string tagName) => query
+        .Where(x => EF.Functions.ILike(x.Name, tagName));
 
     /// <summary>
     /// Projects <see cref="Tag"/>s into <see cref="TagOverview"/>.

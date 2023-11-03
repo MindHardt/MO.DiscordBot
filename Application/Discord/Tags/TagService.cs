@@ -1,8 +1,11 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using Bogus;
+using Data;
 using Data.Entities.Discord;
 using Data.Entities.Tags;
+using Data.Queries;
+using Disqord;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Application.Discord.Tags;
@@ -13,7 +16,10 @@ namespace Application.Discord.Tags;
 /// and finding tag names in messages.
 /// </summary>
 /// <param name="memoryCache"></param>
-public partial class TagNameService(IMemoryCache memoryCache, Faker faker)
+public partial class TagService(
+    DataContext dataContext,
+    IMemoryCache memoryCache,
+    Faker faker)
 {
     [StringSyntax(StringSyntaxAttribute.Regex)]
     public const string TagNameAllowedCharacters = @"[\p{L}\d_\.,\-]";
@@ -29,6 +35,42 @@ public partial class TagNameService(IMemoryCache memoryCache, Faker faker)
 
     [GeneratedRegex(GuildPrefixRegexString)]
     private partial Regex GuildPrefixRegex();
+
+    /// <summary>
+    /// Gets a tag with name similar to <paramref name="prompt"/>.
+    /// </summary>
+    /// <param name="guildId"></param>
+    /// <param name="prompt"></param>
+    /// <param name="ct"></param>
+    /// <returns>
+    /// The found <see cref="Tag"/> or <see langword="null"/>
+    /// if there are no tags or the match is ambiguous.
+    /// </returns>
+    public Task<Tag?> FindSimilarAsync(Snowflake guildId, string prompt, CancellationToken ct = default)
+        => dataContext.Tags
+            .IncludeText()
+            .VisibleIn(guildId)
+            .SearchByName(prompt)
+            .OrderBy(x => x.Name)
+            .GetBestMatchAsync(ct);
+
+    /// <summary>
+    /// Gets a tag with name equal to <paramref name="name"/>.
+    /// </summary>
+    /// <param name="guildId"></param>
+    /// <param name="name"></param>
+    /// <param name="ct"></param>
+    /// <returns>
+    /// The found <see cref="Tag"/> or <see langword="null"/>
+    /// if there are no tags or the match is ambiguous.
+    /// </returns>
+    public Task<Tag?> FindExactAsync(Snowflake guildId, string name, CancellationToken ct = default)
+        => dataContext.Tags
+            .IncludeText()
+            .VisibleIn(guildId)
+            .WithExactName(name)
+            .OrderBy(x => x.Name)
+            .GetBestMatchAsync(ct);
 
     /// <summary>
     /// Validates <see cref="Tag"/> name.

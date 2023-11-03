@@ -36,7 +36,7 @@ public class InlineTagService(ILogger<InlineTagService> logger) : DiscordBotServ
             return;
         }
 
-        var tagNameService = scope.ServiceProvider.GetRequiredService<TagNameService>();
+        var tagNameService = scope.ServiceProvider.GetRequiredService<TagService>();
         var tagName = tagNameService.FindTagName(e.Message.Content, guild.TagPrefix);
         if (tagName is null)
         {

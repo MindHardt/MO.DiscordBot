@@ -11,14 +11,17 @@ public record DeleteTagRequest(
 
 public class DeleteTagHandler(
     DiscordUserAccessor discordUserAccessor,
-    GetTagHandler getTagHandler,
+    TagService tagService,
     DataContext dataContext)
     : IRequestHandler<DeleteTagRequest>
 {
     public async Task HandleAsync(DeleteTagRequest request, CancellationToken ct = default)
     {
-        var getTagRequest = new GetTagRequest(request.GuildId, request.TagName);
-        var tag = await getTagHandler.HandleAsync(getTagRequest, ct);
+        var tag = await tagService.FindExactAsync(request.GuildId, request.TagName, ct);
+        if (tag is null)
+        {
+            throw new ArgumentException($"Тег {request.TagName} не найден");
+        }
 
         var user = await discordUserAccessor.GetAsync(request.UserId, NotFoundEntityAction.Create, true, ct);
         if (tag.CanBeEditedBy(user!) is false)

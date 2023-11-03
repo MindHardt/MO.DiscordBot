@@ -2,12 +2,10 @@
 using Application.Discord.Guilds;
 using Bot.Attributes;
 using Data.Entities.Discord;
-using Disqord;
 using Disqord.Bot.Commands.Application;
 using Disqord.Gateway;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
-using Qommon;
 
 namespace Bot.Commands;
 

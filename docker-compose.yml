@@ -13,9 +13,6 @@ services:
       dockerfile: Bot/Dockerfile
     env_file:
       - .env
-    environment:
-      - Serilog__WriteTo__3__Name=Seq
-      - Serilog__WriteTo__3__Args__serverUrl=http://seq:5341
     depends_on: 
       - seq
   
@@ -31,5 +28,3 @@ services:
     
     ports:
       - "9997:80"
-    expose:
-      - "5341"

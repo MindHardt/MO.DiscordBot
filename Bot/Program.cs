@@ -13,7 +13,9 @@ using Serilog;
 
 var builder = Host.CreateDefaultBuilder(args);
 
-builder.UseSerilog((ctx, logger) => logger.ReadFrom.Configuration(ctx.Configuration));
+builder.UseSerilog((ctx, logger) => logger
+   .ReadFrom.Configuration(ctx.Configuration)
+   .Filter.ByExcluding(x => x.Exception is Disqord.WebSocket.WebSocketClosedException));
 
 builder.ConfigureServices((ctx, services) =>
 {
