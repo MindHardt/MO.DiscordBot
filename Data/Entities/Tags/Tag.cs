@@ -45,7 +45,8 @@ public class TagEntityConfiguration : IEntityTypeConfiguration<Tag>
     public void Configure(EntityTypeBuilder<Tag> builder)
     {
         builder.HasKey(x => x.Id);
-        builder.HasIndex(x => new { x.GuildId, x.Name });
+        builder.HasIndex(x => new { x.GuildId, x.Name })
+            .IsUnique().AreNullsDistinct(false);
 
         builder.HasDiscriminator()
             .HasValue<MessageTag>(nameof(MessageTag))

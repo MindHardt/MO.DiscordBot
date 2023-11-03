@@ -27,6 +27,12 @@ public class CreateTagHandler(
         var user = await discordUserAccessor.GetAsync(request.AuthorId, NotFoundEntityAction.Create, false, ct);
         var guild = await discordGuildAccessor.GetAsync(request.GuildId, NotFoundEntityAction.Create, false, ct);
 
+        var existingTag = await tagService.FindExactAsync(request.GuildId, request.TagName, ct);
+        if (existingTag is not null)
+        {
+            throw new ArgumentException($"Имя тега {request.TagName} занято.");
+        }
+
         var tag = tagFactory.CreateMessageTag(request.TagName, request.Content, user, guild);
         dataContext.Tags.Add(tag);
         await dataContext.SaveChangesAsync(ct);

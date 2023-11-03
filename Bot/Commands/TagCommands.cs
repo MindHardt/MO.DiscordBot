@@ -22,6 +22,8 @@ public class TagCommands : DiscordApplicationGuildModuleBase
         [Maximum(MessageTag.MaxContentLength), Name("содержимое"), Description("текст нового тега")]
         string content)
     {
+        await Deferral();
+
         var request = new CreateTagRequest(Context.AuthorId, Context.GuildId, name, content);
         var result = await Context.Services
             .GetRequiredService<CreateTagHandler>()
@@ -38,6 +40,8 @@ public class TagCommands : DiscordApplicationGuildModuleBase
         [Maximum(Tag.MaxNameLength), Name("имя"), Description("имя искомого тега")]
         string tagName)
     {
+        await Deferral();
+
         var request = new GetTagRequest(Context.GuildId, tagName);
         var result = await Context.Services
             .GetRequiredService<GetTagHandler>()
@@ -54,6 +58,8 @@ public class TagCommands : DiscordApplicationGuildModuleBase
         [Maximum(Tag.MaxNameLength), Name("запрос"), Description("часть имени тега")]
         string prompt = "")
     {
+        await Deferral();
+
         var request = new ListTagsRequest(Context.GuildId, prompt, Discord.Limits.Message.Embed.MaxFieldAmount);
         var result = await Context.Services
             .GetRequiredService<ListTagsHandler>()
@@ -95,6 +101,8 @@ public class TagCommands : DiscordApplicationGuildModuleBase
         [Choice("✅ да", "true"), Choice("❌ нет", "false")]
         string replace = "false")
     {
+        await Deferral();
+
         var allowReplace = bool.Parse(replace);
 
         var request = new RenameTagRequest(Context.GuildId, Context.AuthorId, tagName, newName, allowReplace);
@@ -113,6 +121,8 @@ public class TagCommands : DiscordApplicationGuildModuleBase
         [Name("имя"), Description("Имя удаляемого тега")]
         string tagName)
     {
+        await Deferral();
+
         var request = new DeleteTagRequest(Context.GuildId, Context.AuthorId, tagName);
         var result = await Context.Services
             .GetRequiredService<DeleteTagHandler>()
@@ -125,6 +135,7 @@ public class TagCommands : DiscordApplicationGuildModuleBase
     }
 
     [SlashCommand("синоним"), Description("Создает синоним для тега, позволяя вызывать его по новому имени.")]
+    [RequireAuthorAccess(DiscordUser.AccessLevel.Advanced)]
     public async ValueTask<IResult> CreateTagAlias(
         [Name("имя"), Description("Имя удаляемого тега")]
         string tagName,
@@ -132,6 +143,8 @@ public class TagCommands : DiscordApplicationGuildModuleBase
         [Name("синоним"), Description("Имя синонима тега")]
         string aliasName)
     {
+        await Deferral();
+
         var request = new CreateTagAliasRequest(Context.GuildId, Context.AuthorId, tagName, aliasName);
         var result = await Context.Services
             .GetRequiredService<CreateTagAliasHandler>()
@@ -172,8 +185,11 @@ public class TagCommands : DiscordApplicationGuildModuleBase
 public class MessageTagCommands : DiscordApplicationGuildModuleBase
 {
     [MessageCommand("Создать тег")]
+    [RequireAuthorAccess(DiscordUser.AccessLevel.Advanced)]
     public async ValueTask<IResult> CreateTag(IMessage message)
     {
+        await Deferral();
+
         var name = Context.Services
             .GetRequiredService<TagService>()
             .GenerateRandomTagName();

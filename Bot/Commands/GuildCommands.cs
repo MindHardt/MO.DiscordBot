@@ -15,6 +15,8 @@ public class GuildCommands : DiscordApplicationGuildModuleBase
     [SlashCommand("инфо"), Description("Информация о сервере")]
     public async ValueTask<IResult> Info()
     {
+        await Deferral();
+
         var request = new GetGuildInfoRequest(Context.GuildId);
         var result = await Context.Services
             .GetRequiredService<GetGuildInfoHandler>()
@@ -34,6 +36,8 @@ public class GuildCommands : DiscordApplicationGuildModuleBase
             [Name("префикс"), Description("Новый префикс тегов")]
             string newPrefix)
         {
+            await Deferral();
+
             var request = new SetTagPrefixRequest(Context.GuildId, newPrefix);
             var result = await Context.Services
                 .GetRequiredService<SetTagPrefixHandler>()
@@ -52,6 +56,8 @@ public class GuildCommands : DiscordApplicationGuildModuleBase
             [Choice("✅ включены", "true"), Choice("❌ выключены", "false")]
             string enabled)
         {
+            await Deferral();
+
             var tagsEnabled = bool.Parse(enabled);
             var request = new SetInlineTagsRequest(Context.GuildId, tagsEnabled);
             var result = await Context.Services
