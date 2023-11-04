@@ -57,8 +57,8 @@ public partial class TagService(
             .OrderBy(x => x.Name)
             .GetBestMatchAsync(ct);
 
-        logger.LogInformation("Looking up tag similar to {Prompt} in guild {Guild}, tag found -> {Result}",
-            prompt, guildId, tag is not null);
+        logger.LogInformation("Looking up tag similar to {Prompt} in guild {Guild}, found {Result}",
+            prompt, guildId, tag?.Name);
 
         return tag;
     }
@@ -82,8 +82,8 @@ public partial class TagService(
             .OrderBy(x => x.Name)
             .GetBestMatchAsync(ct);
 
-        logger.LogInformation("Looking up tag with name {Name} in guild {Guild}, tag found? {Result}",
-            name, guildId, tag is not null);
+        logger.LogInformation("Looking up tag with name {Name} in guild {Guild}, found {Result}",
+            name, guildId, tag?.Name);
 
         return tag;
     }
