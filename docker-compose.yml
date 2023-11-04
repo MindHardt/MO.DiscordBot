@@ -2,6 +2,10 @@
 
 volumes: 
   seq-data:
+    
+networks:
+  postgres:
+  seq:
 
 services:
   bot:
@@ -13,20 +17,3 @@ services:
       dockerfile: Bot/Dockerfile
     env_file:
       - .env
-    depends_on: 
-      - seq
-  
-  seq:
-    image: datalust/seq
-    container_name: seq
-    restart: unless-stopped
-    environment:
-      - ACCEPT_EULA=Y
-      
-    volumes:
-      - seq-data:/data
-    
-    ports:
-      - "9997:80"
-    expose:
-      - "5341"
