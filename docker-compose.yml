@@ -17,3 +17,6 @@ services:
       dockerfile: Bot/Dockerfile
     env_file:
       - .env
+    networks: 
+      - seq
+      - postgres
