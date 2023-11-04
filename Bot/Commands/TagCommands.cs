@@ -133,7 +133,7 @@ public class TagCommands : DiscordApplicationGuildModuleBase
             : Qmmands.Results.Failure(result.Exception.Message);
     }
 
-    [SlashCommand("синоним"), Description("Создает синоним для тега, позволяя вызывать его по новому имени.")]
+    [SlashCommand("псевдоним"), Description("Создает псевдоним для тега, позволяя вызывать его по новому имени.")]
     [RequireAuthorAccess(DiscordUser.AccessLevel.Advanced)]
     public async ValueTask<IResult> CreateTagAlias(
         [Name("имя"), Description("Имя удаляемого тега")]
@@ -155,10 +155,30 @@ public class TagCommands : DiscordApplicationGuildModuleBase
             : Qmmands.Results.Failure(result.Exception.Message);
     }
 
+    [SlashCommand("опубликовать"), Description($"Делает тег публичным. {AdministratorCommands.AdminUserOnly}.")]
+    [RequireAuthorAccess(DiscordUser.AccessLevel.Administrator)]
+    public async ValueTask<IResult> PublishTag(
+        [Name("имя"), Description("Имя нового публичного тега")]
+        string tagName)
+    {
+        await Deferral();
+
+        var request = new PublishTagRequest(Context.GuildId, tagName);
+        var result = await Context.Services
+            .GetRequiredService<PublishTagHandler>()
+            .HandleAsync(request, Context.CancellationToken)
+            .AsResult();
+
+        return result.Success
+            ? Response(DiscordResponses.SuccessfulEmbed($"Опубликовал тег {tagName}"))
+            : Qmmands.Results.Failure(result.Exception.Message);
+    }
+
     [AutoComplete("переименовать")]
     [AutoComplete("отправить")]
     [AutoComplete("удалить")]
-    [AutoComplete("синоним")]
+    [AutoComplete("псевдоним")]
+    [AutoComplete("опубликовать")]
     public async ValueTask TagNameAutocomplete(
         [Name("имя")] AutoComplete<string> tagName)
     {

@@ -12,7 +12,7 @@ namespace Bot.Commands;
 [RequireAuthorAccess(DiscordUser.AccessLevel.Administrator)]
 public class AdministratorCommands : DiscordApplicationGuildModuleBase
 {
-    private const string AdminUserOnly = "Только для администраторов бота";
+    public const string AdminUserOnly = "Только для администраторов бота";
 
     [SlashCommand("очистить-кеш"), Description(AdminUserOnly)]
     public IResult ClearCache()
