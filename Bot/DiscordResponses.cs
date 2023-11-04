@@ -6,9 +6,17 @@ using Qommon;
 
 namespace Bot;
 
-public static class DiscordFormatter
+public static class DiscordResponses
 {
-    public static LocalEmbed CreateGuildInfoEmbed(GuildInfo info, IGuild guild) =>
+    public static LocalEmbed SuccessfulEmbed(string? additionalText = null) => new()
+    {
+        Title = Resources.Response_Successful,
+        Timestamp = DateTimeOffset.Now,
+        Description = Optional.FromNullable(additionalText),
+        Color = Color.DarkSeaGreen
+    };
+
+    public static LocalEmbed GuildInfoEmbed(GuildInfo info, IGuild guild) =>
         new()
         {
             Title = guild.Name,
@@ -42,7 +50,7 @@ public static class DiscordFormatter
             }
         };
 
-    public static LocalEmbed CreateUserInfoEmbed(UserInfo info, IUser user) =>
+    public static LocalEmbed UserInfoEmbed(UserInfo info, IUser user) =>
         new()
         {
             Title = (user as IMember)?.Nick ?? user.Name,

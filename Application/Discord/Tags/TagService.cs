@@ -7,6 +7,7 @@ using Data.Entities.Tags;
 using Data.Queries;
 using Disqord;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Discord.Tags;
 
@@ -19,7 +20,8 @@ namespace Application.Discord.Tags;
 public partial class TagService(
     DataContext dataContext,
     IMemoryCache memoryCache,
-    Faker faker)
+    Faker faker,
+    ILogger<TagService> logger)
 {
     [StringSyntax(StringSyntaxAttribute.Regex)]
     public const string TagNameAllowedCharacters = @"[\p{L}\d_\.,\-]";
@@ -46,13 +48,20 @@ public partial class TagService(
     /// The found <see cref="Tag"/> or <see langword="null"/>
     /// if there are no tags or the match is ambiguous.
     /// </returns>
-    public Task<Tag?> FindSimilarAsync(Snowflake guildId, string prompt, CancellationToken ct = default)
-        => dataContext.Tags
+    public async Task<Tag?> FindSimilarAsync(Snowflake guildId, string prompt, CancellationToken ct = default)
+    {
+        var tag = await dataContext.Tags
             .IncludeText()
             .VisibleIn(guildId)
             .SearchByName(prompt)
             .OrderBy(x => x.Name)
             .GetBestMatchAsync(ct);
+
+        logger.LogInformation("Looking up tag similar to {Prompt} in guild {Guild}, tag found -> {Result}",
+            prompt, guildId, tag is not null);
+
+        return tag;
+    }
 
     /// <summary>
     /// Gets a tag with name equal to <paramref name="name"/>.
@@ -64,13 +73,20 @@ public partial class TagService(
     /// The found <see cref="Tag"/> or <see langword="null"/>
     /// if there are no tags or the match is ambiguous.
     /// </returns>
-    public Task<Tag?> FindExactAsync(Snowflake guildId, string name, CancellationToken ct = default)
-        => dataContext.Tags
+    public async Task<Tag?> FindExactAsync(Snowflake guildId, string name, CancellationToken ct = default)
+    {
+        var tag = await dataContext.Tags
             .IncludeText()
             .VisibleIn(guildId)
             .WithExactName(name)
             .OrderBy(x => x.Name)
             .GetBestMatchAsync(ct);
+
+        logger.LogInformation("Looking up tag with name {Name} in guild {Guild}, tag found? {Result}",
+            name, guildId, tag is not null);
+
+        return tag;
+    }
 
     /// <summary>
     /// Validates <see cref="Tag"/> name.
@@ -126,9 +142,14 @@ public partial class TagService(
         var regex = memoryCache.GetOrCreate(cacheKey, _ => CreateRegex(prefix))!;
         var match = regex.Match(message);
 
-        return match.Groups["NAME"].Value is { Length: > 0 } tagName
+        var foundTagName = match.Groups["NAME"].Value is { Length: > 0 } tagName
             ? tagName
             : null;
+
+        logger.LogInformation("Looking for tag name in text {Text} with prefix {Prefix}: Found {Tag}",
+            message, prefix, foundTagName);
+
+        return foundTagName;
     }
 
     /// <summary>
@@ -137,16 +158,25 @@ public partial class TagService(
     /// <returns></returns>
     public string GenerateRandomTagName()
     {
+        int attempt = 1;
         while (true)
         {
             var tagName = string.Join('-', faker.Lorem.Words()).ToLower();
             if (TagNameValid(tagName))
             {
+                logger.LogInformation("Generated random tag name {Name} in {Attempts} attempts",
+                    tagName, attempt);
                 return tagName;
             }
+            attempt++;
         }
     }
 
-    private static Regex CreateRegex(string prefix) =>
-        new($"{Regex.Escape(prefix)}(?<NAME>{TagNameAllowedCharacters}{{0,{Tag.MaxNameLength}}})", RegexOptions.Compiled);
+    private Regex CreateRegex(string prefix)
+    {
+        var pattern = $"{Regex.Escape(prefix)}(?<NAME>{TagNameAllowedCharacters}{{0,{Tag.MaxNameLength}}})";
+        logger.LogInformation("Creating tag lookup regex with pattern {Pattern}", pattern);
+
+        return new Regex(pattern, RegexOptions.Compiled);
+    }
 }

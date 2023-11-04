@@ -105,6 +105,15 @@ namespace Bot {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ✅ Успешно.
+        /// </summary>
+        internal static string Response_Successful {
+            get {
+                return ResourceManager.GetString("Response.Successful", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 🎧 Звук.
         /// </summary>
         internal static string Sound {

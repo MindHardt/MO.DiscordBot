@@ -45,4 +45,7 @@
     <data name="AccessLevel" xml:space="preserve">
         <value>💳 Доступ</value>
     </data>
+    <data name="Response.Successful" xml:space="preserve">
+        <value>✅ Успешно</value>
+    </data>
 </root>

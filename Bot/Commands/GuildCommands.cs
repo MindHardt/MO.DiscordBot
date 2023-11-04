@@ -24,7 +24,7 @@ public class GuildCommands : DiscordApplicationGuildModuleBase
             .AsResult();
 
         return result.Success
-            ? Response(DiscordFormatter.CreateGuildInfoEmbed(result.Value, Bot.GetGuild(Context.GuildId)!))
+            ? Response(DiscordResponses.GuildInfoEmbed(result.Value, Bot.GetGuild(Context.GuildId)!))
             : Qmmands.Results.Failure(result.Exception.Message);
     }
 

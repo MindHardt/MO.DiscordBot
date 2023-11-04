@@ -31,7 +31,7 @@ public class TagCommands : DiscordApplicationGuildModuleBase
             .AsResult();
 
         return result.Success
-            ? Response("✅")
+            ? Response(DiscordResponses.SuccessfulEmbed($"Создал тег {Markdown.Code(name)}"))
             : Qmmands.Results.Failure(result.Exception.Message);
     }
 
@@ -83,11 +83,10 @@ public class TagCommands : DiscordApplicationGuildModuleBase
                 }))
             .Select(x => $"{x.TagKind}| {x.Number}. {x.Name}");
 
-        var embed = new LocalEmbed
-        {
-            Title = $"Теги по запросу [{prompt}]",
-            Description = Markdown.CodeBlock(string.Join('\n', tagLines)),
-        };
+        var embed = DiscordResponses.SuccessfulEmbed()
+            .WithTitle($"Теги по запросу [{prompt}]")
+            .WithDescription(Markdown.CodeBlock(string.Join('\n', tagLines)));
+
         return Response(embed);
     }
 
@@ -112,7 +111,7 @@ public class TagCommands : DiscordApplicationGuildModuleBase
             .AsResult();
 
         return result.Success
-            ? Response($"Переименовал тег {Markdown.Code(newName)}")
+            ? Response(DiscordResponses.SuccessfulEmbed($"Переименовал тег {Markdown.Code(newName)}"))
             : Qmmands.Results.Failure(result.Exception.Message);
     }
 
@@ -130,7 +129,7 @@ public class TagCommands : DiscordApplicationGuildModuleBase
             .AsResult();
 
         return result.Success
-            ? Response("Успешно удалил тег ✅")
+            ? Response(DiscordResponses.SuccessfulEmbed($"Удалил тег {Markdown.Code(tagName)}"))
             : Qmmands.Results.Failure(result.Exception.Message);
     }
 
@@ -152,7 +151,7 @@ public class TagCommands : DiscordApplicationGuildModuleBase
             .AsResult();
 
         return result.Success
-            ? Response($"Создал синоним {Markdown.Code(aliasName)}")
+            ? Response(DiscordResponses.SuccessfulEmbed($"Создал синоним {Markdown.Code(aliasName)}"))
             : Qmmands.Results.Failure(result.Exception.Message);
     }
 
@@ -204,7 +203,7 @@ public class MessageTagCommands : DiscordApplicationGuildModuleBase
             .AsResult();
 
         return result.Success
-            ? Response($"Создал тег {Markdown.Code(name)}")
+            ? Response(DiscordResponses.SuccessfulEmbed($"Создал тег {Markdown.Code(name)}"))
             : Qmmands.Results.Failure(result.Exception.Message);
     }
 }

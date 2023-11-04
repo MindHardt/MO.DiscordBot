@@ -24,7 +24,7 @@ public class UserCommands : DiscordApplicationGuildModuleBase
             .AsResult();
 
         return result.Success
-            ? Response(DiscordFormatter.CreateUserInfoEmbed(result.Value, user))
+            ? Response(DiscordResponses.UserInfoEmbed(result.Value, user))
             : Qmmands.Results.Failure(result.Exception.Message);
     }
 
@@ -74,7 +74,7 @@ public class MessageUserCommands : DiscordApplicationGuildModuleBase
             .AsResult();
 
         return result.Success
-            ? Response(DiscordFormatter.CreateUserInfoEmbed(result.Value, user))
+            ? Response(DiscordResponses.UserInfoEmbed(result.Value, user))
             : Qmmands.Results.Failure(result.Exception.Message);
     }
 }
