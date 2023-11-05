@@ -13,7 +13,13 @@ public class GetTagHandler(TagService tagService) : IRequestHandler<GetTagReques
 {
     public async Task<Tag> HandleAsync(GetTagRequest request, CancellationToken ct)
     {
-        return await tagService.FindSimilarAsync(request.GuildId, request.Prompt, ct)
-            ?? throw new ArgumentException("Тег не найден");;
+        var tag = await tagService.FindSimilarAsync(request.GuildId, request.Prompt, ct);
+
+        if (tag is null)
+        {
+            TagThrows.ThrowTagNotFound(request.Prompt);
+        }
+
+        return tag;
     }
 }

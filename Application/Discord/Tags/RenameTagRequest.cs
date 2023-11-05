@@ -25,13 +25,13 @@ public class RenameTagHandler(
         var tag = await tagService.FindSimilarAsync(request.GuildId, request.TagName, ct);
         if (tag is null)
         {
-            throw new ArgumentException($"Тег {request.TagName} не найден");
+            TagThrows.ThrowTagNotFound(request.TagName);
         }
 
         var user = await discordUserAccessor.GetAsync(request.UserId, NotFoundEntityAction.Create, true, ct);
         if (tag.CanBeEditedBy(user!) is false)
         {
-            throw new ArgumentException($"У вас нет права редактировать тег {tag.Name}");
+            TagThrows.ThrowAccessDenied();
         }
 
         var existingTag = await tagService.FindExactAsync(request.GuildId, request.NewTagName, ct);
@@ -43,22 +43,14 @@ public class RenameTagHandler(
         }
 
         var canReplace = existingTag.CanBeEditedBy(user!);
-        var exceptionMessage = (canReplace, request.AllowReplace) switch
+        switch (canReplace, request.AllowReplace)
         {
-            { canReplace: true, AllowReplace: true } => null,
-
-            { canReplace: true, AllowReplace: false } =>
-                $"Тег {request.NewTagName} существует. Если вы хотите заменить его укажите это при выполнении команды.",
-
-            { canReplace: false, AllowReplace: true } =>
-                $"Тег {request.NewTagName} существует и у вас нет права на его перезапись.",
-
-            { canReplace: false, AllowReplace: false } =>
-                $"Имя тега {request.NewTagName} уже занято."
-        };
-        if (exceptionMessage is not null)
-        {
-            throw new InvalidOperationException(exceptionMessage);
+            case { AllowReplace: false }:
+                TagThrows.ThrowTagNameOccupied(request.NewTagName);
+                break;
+            case { canReplace: false, AllowReplace: true }:
+                TagThrows.ThrowAccessDenied();
+                break;
         }
 
         switch (existingTag)

@@ -30,7 +30,7 @@ public class CreateTagHandler(
         var existingTag = await tagService.FindExactAsync(request.GuildId, request.TagName, ct);
         if (existingTag is not null)
         {
-            throw new ArgumentException($"Имя тега {request.TagName} занято.");
+            TagThrows.ThrowTagNameOccupied(request.TagName);
         }
 
         var tag = tagFactory.CreateMessageTag(request.TagName, request.Content, user, guild);

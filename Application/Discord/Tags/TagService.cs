@@ -96,7 +96,7 @@ public partial class TagService(
     public void ValidateTagName(string tagName)
     {
         if (TagNameValid(tagName) is false)
-            throw new ArgumentException(string.Format(TagResources.TagNameInvalidErrorMessage, tagName));
+            TagThrows.ThrowTagNameInvalid(tagName);
     }
 
     /// <summary>
@@ -117,7 +117,7 @@ public partial class TagService(
     public void ValidateGuildPrefix(string prefix)
     {
         if (GuildPrefixValid(prefix) is false)
-            throw new ArgumentException(string.Format(TagResources.GuildPrefixInvalidErrorMessage, prefix));
+            TagThrows.ThrowTagPrefixInvalid(prefix);
     }
 
     /// <summary>

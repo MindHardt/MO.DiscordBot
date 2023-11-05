@@ -17,7 +17,7 @@ public class PublishTagHandler(
         var tag = await tagService.FindExactAsync(request.GuildId, request.TagName, ct);
         if (tag is null)
         {
-            throw new ArgumentException($"Тег {request.TagName} не найден");
+            TagThrows.ThrowTagNotFound(request.TagName);
         }
 
         tag.GuildId = null;

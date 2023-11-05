@@ -14,7 +14,7 @@ public record ListTagsRequest(
     : IRequest<IReadOnlyCollection<TagOverview>>;
 
 public class ListTagsHandler(
-    DataContext dataContext) 
+    DataContext dataContext)
     : IRequestHandler<ListTagsRequest, IReadOnlyCollection<TagOverview>>
 {
     public async Task<IReadOnlyCollection<TagOverview>> HandleAsync(ListTagsRequest request, CancellationToken ct)

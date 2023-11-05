@@ -18,19 +18,7 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
-    <data name="TagNameInvalidErrorMessage" xml:space="preserve">
-        <value>Имя тега "{0}" недопустимо!</value>
-    </data>
-    <data name="GuildPrefixInvalidErrorMessage" xml:space="preserve">
-        <value>Префикс "{0}" недопустим!</value>
-    </data>
-    <data name="TagNotFoundErrorMessage" xml:space="preserve">
-        <value>Тег "{0}" не найден!</value>
-    </data>
-    <data name="TagNameOccupiedErrorMessage" xml:space="preserve">
-        <value>Имя тега "{0}" занято!</value>
-    </data>
-    <data name="TagEditOrDeleteAction" xml:space="preserve">
-        <value>удаление или редактирование этого тега</value>
+    <data name="AccessDeniedErrorMessage" xml:space="preserve">
+        <value>У вас нет прав на {0}!</value>
     </data>
 </root>

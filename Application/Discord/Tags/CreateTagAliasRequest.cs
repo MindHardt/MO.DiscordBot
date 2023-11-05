@@ -33,13 +33,13 @@ public class CreateTagAliasHandler(
         };
         if (messageTag is null)
         {
-            throw new ArgumentException("Ошибка получения тега");
+            TagThrows.ThrowTagNotFound(request.OriginalTagName);
         }
 
         var existingTag = await tagService.FindExactAsync(request.GuildId, request.AliasName, ct);
         if (existingTag is not null)
         {
-            throw new ArgumentException($"Имя тега {request.AliasName} занято.");
+            TagThrows.ThrowTagNameOccupied(request.AliasName);
         }
 
         var user = await discordUserAccessor.GetAsync(request.UserId, NotFoundEntityAction.Create, false, ct);

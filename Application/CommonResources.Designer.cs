@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Application.Discord.Tags {
+namespace Application {
     using System;
     
     
@@ -21,14 +21,14 @@ namespace Application.Discord.Tags {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class TagResources {
+    internal class CommonResources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal TagResources() {
+        internal CommonResources() {
         }
         
         /// <summary>
@@ -38,7 +38,7 @@ namespace Application.Discord.Tags {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Application.Discord.Tags.TagResources", typeof(TagResources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Application.CommonResources", typeof(CommonResources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -60,47 +60,11 @@ namespace Application.Discord.Tags {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Префикс &quot;{0}&quot; недопустим!.
+        ///   Looks up a localized string similar to У вас нет прав на {0}!.
         /// </summary>
-        internal static string GuildPrefixInvalidErrorMessage {
+        internal static string AccessDeniedErrorMessage {
             get {
-                return ResourceManager.GetString("GuildPrefixInvalidErrorMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to удаление или редактирование этого тега.
-        /// </summary>
-        internal static string TagEditOrDeleteAction {
-            get {
-                return ResourceManager.GetString("TagEditOrDeleteAction", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Имя тега &quot;{0}&quot; недопустимо!.
-        /// </summary>
-        internal static string TagNameInvalidErrorMessage {
-            get {
-                return ResourceManager.GetString("TagNameInvalidErrorMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Имя тега &quot;{0}&quot; занято!.
-        /// </summary>
-        internal static string TagNameOccupiedErrorMessage {
-            get {
-                return ResourceManager.GetString("TagNameOccupiedErrorMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Тег &quot;{0}&quot; не найден!.
-        /// </summary>
-        internal static string TagNotFoundErrorMessage {
-            get {
-                return ResourceManager.GetString("TagNotFoundErrorMessage", resourceCulture);
+                return ResourceManager.GetString("AccessDeniedErrorMessage", resourceCulture);
             }
         }
     }

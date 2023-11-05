@@ -20,13 +20,13 @@ public class DeleteTagHandler(
         var tag = await tagService.FindExactAsync(request.GuildId, request.TagName, ct);
         if (tag is null)
         {
-            throw new ArgumentException($"Тег {request.TagName} не найден");
+            TagThrows.ThrowTagNotFound(request.TagName);
         }
 
         var user = await discordUserAccessor.GetAsync(request.UserId, NotFoundEntityAction.Create, true, ct);
         if (tag.CanBeEditedBy(user!) is false)
         {
-            throw new ArgumentException($"У вас нет прав на удаление тега {tag.Name}");
+            TagThrows.ThrowAccessDenied();
         }
 
         dataContext.Tags.Remove(tag);
