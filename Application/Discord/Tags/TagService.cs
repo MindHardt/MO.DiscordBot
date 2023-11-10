@@ -174,7 +174,7 @@ public partial class TagService(
 
     private Regex CreateRegex(string prefix)
     {
-        var pattern = $"{Regex.Escape(prefix)}(?<NAME>{TagNameAllowedCharacters}{{0,{Tag.MaxNameLength}}})";
+        var pattern = @$"{Regex.Escape(prefix)}\s?(?<NAME>{TagNameAllowedCharacters}{{0,{Tag.MaxNameLength}}})";
         logger.LogInformation("Creating tag lookup regex with pattern {Pattern}", pattern);
 
         return new Regex(pattern, RegexOptions.Compiled);
