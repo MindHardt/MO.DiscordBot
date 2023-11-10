@@ -96,6 +96,15 @@ namespace Bot {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ⌛ Задержка.
+        /// </summary>
+        internal static string Latency {
+            get {
+                return ResourceManager.GetString("Latency", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 🎙️ Микро.
         /// </summary>
         internal static string Microphone {
@@ -119,6 +128,15 @@ namespace Bot {
         internal static string Sound {
             get {
                 return ResourceManager.GetString("Sound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 🏁 Запущен.
+        /// </summary>
+        internal static string StartedAt {
+            get {
+                return ResourceManager.GetString("StartedAt", resourceCulture);
             }
         }
         
