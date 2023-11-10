@@ -53,9 +53,8 @@ public partial class TagService(
         var tag = await dataContext.Tags
             .IncludeText()
             .VisibleIn(guildId)
-            .SearchByName(prompt)
             .OrderBy(x => x.Name)
-            .GetBestMatchAsync(ct);
+            .GetBestNameMatchAsync(prompt, ct);
 
         logger.LogInformation("Looking up tag similar to {Prompt} in guild {Guild}, found {Result}",
             prompt, guildId, tag?.Name);

@@ -70,4 +70,31 @@ public static class TagQueries
                 ? TagKind.Message
                 : TagKind.Alias
         });
+
+    /// <summary>
+    /// Finds the best match for <see cref="prompt"/>.
+    /// If prompt yields multiple results but one is a full-match then it is selected.
+    /// </summary>
+    /// <param name="query"></param>
+    /// <param name="prompt"></param>
+    /// <param name="ct"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    public static async Task<Tag?> GetBestNameMatchAsync(this IQueryable<Tag> query, string prompt, CancellationToken ct)
+    {
+        var tags = await query
+            .Where(x => EF.Functions.ILike(x.Name, $"%{prompt}%"))
+            .OrderByDescending(x => EF.Functions.ILike(x.Name, prompt))
+            .Take(2)
+            .ToArrayAsync(ct);
+
+        return tags.Length switch
+        {
+            0 => null,
+            1 => tags[0],
+            2 => tags.FirstOrDefault(x => x.Name.Equals(prompt, StringComparison.InvariantCultureIgnoreCase)),
+            
+            _ => throw new ArgumentOutOfRangeException()
+        };
+    }
 }
