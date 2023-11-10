@@ -20,6 +20,6 @@ public class AdministratorCommands : DiscordApplicationGuildModuleBase
         var cache = Bot.Services.GetRequiredService<IMemoryCache>() as MemoryCache;
         cache?.Clear();
 
-        return Response("✅");
+        return Response(DiscordResponses.SuccessfulEmbed());
     }
 }

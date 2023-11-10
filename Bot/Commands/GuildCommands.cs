@@ -45,7 +45,7 @@ public class GuildCommands : DiscordApplicationGuildModuleBase
                 .AsResult();
 
             return result.Success
-                ? Response("✅")
+                ? Response(DiscordResponses.SuccessfulEmbed())
                 : Qmmands.Results.Failure(result.Exception.Message);
         }
 
@@ -66,7 +66,7 @@ public class GuildCommands : DiscordApplicationGuildModuleBase
                 .AsResult();
 
             return result.Success
-                ? Response($"Строчные теги на сервере - {result.Value.InlineTagsEnabled.ToEmoji()}")
+                ? Response(DiscordResponses.SuccessfulEmbed($"Строчные теги на сервере - {result.Value.InlineTagsEnabled.ToEmoji()}"))
                 : Qmmands.Results.Failure(result.Exception.Message);
         }
     }

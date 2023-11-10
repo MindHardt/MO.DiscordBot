@@ -53,7 +53,10 @@ public class UserCommands : DiscordApplicationGuildModuleBase
         var shouldNotify = bool.Parse(notification);
         var response = new LocalInteractionMessageResponse
             {
-                Content = $"{user.Mention} теперь {accessLevel.ToName()}!",
+                Embeds = new[]
+                {
+                    DiscordResponses.SuccessfulEmbed($"{user.Mention} теперь {accessLevel.ToName()}!")
+                },
                 AllowedMentions = shouldNotify
                     ? LocalAllowedMentions.ExceptEveryone
                     : LocalAllowedMentions.None
