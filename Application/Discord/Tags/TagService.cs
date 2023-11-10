@@ -30,7 +30,7 @@ public partial class TagService(
     public const string TagNameRegexString = $"^{TagNameAllowedCharacters}+$";
 
     [StringSyntax(StringSyntaxAttribute.Regex)]
-    public const string GuildPrefixRegexString = "[\\S]+";
+    public const string GuildPrefixRegexString = ".+";
 
     [GeneratedRegex(TagNameRegexString)]
     private partial Regex TagNameRegex();
@@ -146,7 +146,7 @@ public partial class TagService(
             ? tagName
             : null;
 
-        logger.LogInformation("Looking for tag name in text {Text} with prefix {Prefix}: Found {Tag}",
+        logger.LogInformation("Looking for tag name in text {Text} with prefix {Prefix}: found {Tag}",
             message, prefix, foundTagName);
 
         return foundTagName;
