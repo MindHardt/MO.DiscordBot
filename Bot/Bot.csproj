@@ -36,6 +36,8 @@
       <None Update="appsettings.Development.json">
         <DependentUpon>appsettings.json</DependentUpon>
       </None>
+      <None Remove="application-commands\**" />
+      <None Remove="Logs\**" />
     </ItemGroup>
 
     <ItemGroup>
@@ -49,6 +51,8 @@
         <Generator>ResXFileCodeGenerator</Generator>
         <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       </EmbeddedResource>
+      <EmbeddedResource Remove="application-commands\**" />
+      <EmbeddedResource Remove="Logs\**" />
     </ItemGroup>
 
     <ItemGroup>
@@ -57,6 +61,8 @@
         <AutoGen>True</AutoGen>
         <DependentUpon>Resources.resx</DependentUpon>
       </Compile>
+      <Compile Remove="application-commands\**" />
+      <Compile Remove="Logs\**" />
     </ItemGroup>
 
 </Project>

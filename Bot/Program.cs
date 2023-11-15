@@ -35,9 +35,8 @@ builder.ConfigureServices((ctx, services) =>
 
 builder.ConfigureDiscordBot<MoDiscordBot>((host, bot) =>
 {
-   var discordOptions = host.Configuration.GetSection("Discord").Get<DiscordOptions>()
-      ?? throw new InvalidOperationException($"Cannot bind {nameof(DiscordOptions)} from configuration");
-   bot.Token = discordOptions.Token;
+   bot.Token = host.Configuration["Discord:Token"]
+      ?? throw new InvalidOperationException("Cannot retrieve discord bot token from configuration");
    bot.Intents = GatewayIntents.Unprivileged | GatewayIntents.MessageContent;
 });
 
