@@ -5,7 +5,10 @@ volumes:
     
 networks:
   postgres:
+    external: true
+
   seq:
+    external: true
 
 services:
   bot:
