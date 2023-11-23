@@ -1,7 +1,9 @@
 ﻿using Application.Accessors;
 using Data;
 using Data.Entities.Tags;
+using Data.Queries;
 using Disqord;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Discord.Tags;
 
@@ -23,7 +25,10 @@ public class CreateTagAliasHandler(
     {
         tagService.ValidateTagName(request.AliasName);
 
-        var tag = await tagService.FindSimilarAsync(request.GuildId, request.OriginalTagName, ct);
+        var tag = await dataContext.Tags
+            .WhereVisibleIn(request.GuildId)
+            .WhereNameExactly(request.OriginalTagName)
+            .FirstOrDefaultAsync(ct);
 
         var messageTag = tag switch
         {
@@ -36,8 +41,11 @@ public class CreateTagAliasHandler(
             TagThrows.ThrowTagNotFound(request.OriginalTagName);
         }
 
-        var existingTag = await tagService.FindExactAsync(request.GuildId, request.AliasName, ct);
-        if (existingTag is not null)
+        var tagExists = await dataContext.Tags
+            .WhereVisibleIn(request.GuildId)
+            .WhereNameExactly(request.AliasName)
+            .AnyAsync(ct);
+        if (tagExists)
         {
             TagThrows.ThrowTagNameOccupied(request.AliasName);
         }

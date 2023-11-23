@@ -1,5 +1,7 @@
 ﻿using Data;
+using Data.Queries;
 using Disqord;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Discord.Tags;
 
@@ -8,13 +10,15 @@ public record PublishTagRequest(
     string TagName);
 
 public class PublishTagHandler(
-    TagService tagService,
     DataContext dataContext)
     : IRequestHandler<PublishTagRequest>
 {
     public async Task HandleAsync(PublishTagRequest request, CancellationToken ct = default)
     {
-        var tag = await tagService.FindExactAsync(request.GuildId, request.TagName, ct);
+        var tag = await dataContext.Tags
+            .WhereVisibleIn(request.GuildId)
+            .WhereNameExactly(request.TagName)
+            .FirstOrDefaultAsync(ct);
         if (tag is null)
         {
             TagThrows.ThrowTagNotFound(request.TagName);

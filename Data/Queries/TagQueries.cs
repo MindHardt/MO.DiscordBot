@@ -14,7 +14,7 @@ public static class TagQueries
     /// <param name="query"></param>
     /// <param name="guildId"></param>
     /// <returns></returns>
-    public static IQueryable<Tag> VisibleIn(this IQueryable<Tag> query, Snowflake guildId) => query
+    public static IQueryable<Tag> WhereVisibleIn(this IQueryable<Tag> query, Snowflake guildId) => query
         .Where(x => x.GuildId == null || x.GuildId == guildId);
 
     /// <summary>
@@ -23,8 +23,8 @@ public static class TagQueries
     /// <param name="query"></param>
     /// <param name="guild"></param>
     /// <returns></returns>
-    public static IQueryable<Tag> VisibleIn(this IQueryable<Tag> query, DiscordGuild guild) => query
-        .VisibleIn(guild.Id);
+    public static IQueryable<Tag> WhereVisibleIn(this IQueryable<Tag> query, DiscordGuild guild) => query
+        .WhereVisibleIn(guild.Id);
 
     /// <summary>
     /// Searches for <see cref="Tag"/>s that have name similar to <see cref="prompt"/>.
@@ -33,15 +33,15 @@ public static class TagQueries
     /// <param name="prompt"></param>
     /// <returns></returns>
     /// <remarks>The search is case-insensitive.</remarks>
-    public static IQueryable<Tag> SearchByName(this IQueryable<Tag> query, string prompt) => query
+    public static IQueryable<Tag> WhereNameLike(this IQueryable<Tag> query, string prompt) => query
         .Where(x => EF.Functions.ILike(x.Name, $"%{prompt}%"));
 
     /// <summary>
-    /// Includes data necessary to access <see cref="Tag.Text"/>.
+    /// Includes <see cref="AliasTag.ReferencedTag"/> for <see cref="AliasTag"/>s.
     /// </summary>
     /// <param name="query"></param>
     /// <returns></returns>
-    public static IQueryable<Tag> IncludeText(this IQueryable<Tag> query) => query
+    public static IQueryable<Tag> IncludeReferencedTag(this IQueryable<Tag> query) => query
         .Include(x => ((AliasTag)x).ReferencedTag);
 
     /// <summary>
@@ -51,7 +51,7 @@ public static class TagQueries
     /// <param name="tagName"></param>
     /// <returns></returns>
     /// <remarks>The search is case-insensitive.</remarks>
-    public static IQueryable<Tag> WithExactName(this IQueryable<Tag> query, string tagName) => query
+    public static IQueryable<Tag> WhereNameExactly(this IQueryable<Tag> query, string tagName) => query
         .Where(x => EF.Functions.ILike(x.Name, tagName));
 
     /// <summary>
@@ -70,31 +70,4 @@ public static class TagQueries
                 ? TagKind.Message
                 : TagKind.Alias
         });
-
-    /// <summary>
-    /// Finds the best match for <see cref="prompt"/>.
-    /// If prompt yields multiple results but one is a full-match then it is selected.
-    /// </summary>
-    /// <param name="query"></param>
-    /// <param name="prompt"></param>
-    /// <param name="ct"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public static async Task<Tag?> GetBestNameMatchAsync(this IQueryable<Tag> query, string prompt, CancellationToken ct)
-    {
-        var tags = await query
-            .Where(x => EF.Functions.ILike(x.Name, $"%{prompt}%"))
-            .OrderByDescending(x => EF.Functions.ILike(x.Name, prompt))
-            .Take(2)
-            .ToArrayAsync(ct);
-
-        return tags.Length switch
-        {
-            0 => null,
-            1 => tags[0],
-            2 => tags.FirstOrDefault(x => x.Name.Equals(prompt, StringComparison.InvariantCultureIgnoreCase)),
-            
-            _ => throw new ArgumentOutOfRangeException()
-        };
-    }
 }

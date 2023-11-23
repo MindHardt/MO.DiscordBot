@@ -1,6 +1,8 @@
 ﻿using Application.Accessors;
 using Data;
+using Data.Queries;
 using Disqord;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Discord.Tags;
 
@@ -11,13 +13,15 @@ public record DeleteTagRequest(
 
 public class DeleteTagHandler(
     DiscordUserAccessor discordUserAccessor,
-    TagService tagService,
     DataContext dataContext)
     : IRequestHandler<DeleteTagRequest>
 {
     public async Task HandleAsync(DeleteTagRequest request, CancellationToken ct = default)
     {
-        var tag = await tagService.FindExactAsync(request.GuildId, request.TagName, ct);
+        var tag = await dataContext.Tags
+            .WhereVisibleIn(request.GuildId)
+            .WhereNameExactly(request.TagName)
+            .FirstOrDefaultAsync(ct);
         if (tag is null)
         {
             TagThrows.ThrowTagNotFound(request.TagName);

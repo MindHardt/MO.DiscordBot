@@ -1,19 +1,26 @@
-﻿using Data.Entities.Tags;
+﻿using Data;
+using Data.Entities.Tags;
+using Data.Queries;
 using Disqord;
-using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Discord.Tags;
 
 public record GetTagRequest(
     Snowflake GuildId,
-    string Prompt)
-    : IRequest<Tag>;
+    string Prompt);
 
-public class GetTagHandler(TagService tagService) : IRequestHandler<GetTagRequest, Tag>
+public class GetTagHandler(
+    DataContext dataContext)
+    : IRequestHandler<GetTagRequest, Tag>
 {
     public async Task<Tag> HandleAsync(GetTagRequest request, CancellationToken ct)
     {
-        var tag = await tagService.FindSimilarAsync(request.GuildId, request.Prompt, ct);
+        var tag = await dataContext.Tags
+            .IncludeReferencedTag()
+            .WhereVisibleIn(request.GuildId)
+            .WhereNameExactly(request.Prompt)
+            .FirstOrDefaultAsync(ct);
 
         if (tag is null)
         {

@@ -1,8 +1,8 @@
 ﻿using Application.Accessors;
 using Data;
-using Data.Entities.Tags;
+using Data.Queries;
 using Disqord;
-using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Discord.Tags;
 
@@ -10,7 +10,7 @@ public record CreateTagRequest(
     Snowflake AuthorId,
     Snowflake GuildId,
     string TagName,
-    string Content) : IRequest<MessageTag>;
+    string Content);
 
 public class CreateTagHandler(
     TagFactory tagFactory,
@@ -27,8 +27,11 @@ public class CreateTagHandler(
         var user = await discordUserAccessor.GetAsync(request.AuthorId, NotFoundEntityAction.Create, false, ct);
         var guild = await discordGuildAccessor.GetAsync(request.GuildId, NotFoundEntityAction.Create, false, ct);
 
-        var existingTag = await tagService.FindExactAsync(request.GuildId, request.TagName, ct);
-        if (existingTag is not null)
+        var nameOccupied = await dataContext.Tags
+            .WhereVisibleIn(request.GuildId)
+            .WhereNameExactly(request.TagName)
+            .AnyAsync(ct);
+        if (nameOccupied)
         {
             TagThrows.ThrowTagNameOccupied(request.TagName);
         }

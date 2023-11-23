@@ -2,7 +2,6 @@
 using Data.Projections;
 using Data.Queries;
 using Disqord;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Discord.Tags;
@@ -10,8 +9,7 @@ namespace Application.Discord.Tags;
 public record ListTagsRequest(
     Snowflake GuildId,
     string Prompt,
-    int Limit)
-    : IRequest<IReadOnlyCollection<TagOverview>>;
+    int Limit);
 
 public class ListTagsHandler(
     DataContext dataContext)
@@ -20,8 +18,8 @@ public class ListTagsHandler(
     public async Task<IReadOnlyCollection<TagOverview>> HandleAsync(ListTagsRequest request, CancellationToken ct)
     {
         return await dataContext.Tags
-            .VisibleIn(request.GuildId)
-            .SearchByName(request.Prompt)
+            .WhereVisibleIn(request.GuildId)
+            .WhereNameLike(request.Prompt)
             .OrderBy(x => x.Name)
             .Take(request.Limit)
             .AsOverviews()

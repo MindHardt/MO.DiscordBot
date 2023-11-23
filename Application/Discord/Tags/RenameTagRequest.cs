@@ -1,7 +1,9 @@
 ﻿using Application.Accessors;
 using Data;
 using Data.Entities.Tags;
+using Data.Queries;
 using Disqord;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Discord.Tags;
 
@@ -22,7 +24,10 @@ public class RenameTagHandler(
     {
         tagService.ValidateTagName(request.NewTagName);
 
-        var tag = await tagService.FindSimilarAsync(request.GuildId, request.TagName, ct);
+        var tag = await dataContext.Tags
+            .WhereVisibleIn(request.GuildId)
+            .WhereNameExactly(request.TagName)
+            .FirstOrDefaultAsync(ct);
         if (tag is null)
         {
             TagThrows.ThrowTagNotFound(request.TagName);
@@ -34,7 +39,10 @@ public class RenameTagHandler(
             TagThrows.ThrowAccessDenied();
         }
 
-        var existingTag = await tagService.FindExactAsync(request.GuildId, request.NewTagName, ct);
+        var existingTag = await dataContext.Tags
+            .WhereVisibleIn(request.GuildId)
+            .WhereNameExactly(request.NewTagName)
+            .FirstOrDefaultAsync(ct);
         if (existingTag is null)
         {
             tag.Name = request.NewTagName;

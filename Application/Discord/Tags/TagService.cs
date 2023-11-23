@@ -4,8 +4,10 @@ using Bogus;
 using Data;
 using Data.Entities.Discord;
 using Data.Entities.Tags;
+using Data.Projections;
 using Data.Queries;
 using Disqord;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
@@ -39,30 +41,6 @@ public partial class TagService(
     private partial Regex GuildPrefixRegex();
 
     /// <summary>
-    /// Gets a tag with name similar to <paramref name="prompt"/>.
-    /// </summary>
-    /// <param name="guildId"></param>
-    /// <param name="prompt"></param>
-    /// <param name="ct"></param>
-    /// <returns>
-    /// The found <see cref="Tag"/> or <see langword="null"/>
-    /// if there are no tags or the match is ambiguous.
-    /// </returns>
-    public async Task<Tag?> FindSimilarAsync(Snowflake guildId, string prompt, CancellationToken ct = default)
-    {
-        var tag = await dataContext.Tags
-            .IncludeText()
-            .VisibleIn(guildId)
-            .OrderBy(x => x.Name)
-            .GetBestNameMatchAsync(prompt, ct);
-
-        logger.LogInformation("Looking up tag similar to {Prompt} in guild {Guild}, found {Result}",
-            prompt, guildId, tag?.Name);
-
-        return tag;
-    }
-
-    /// <summary>
     /// Gets a tag with name equal to <paramref name="name"/>.
     /// </summary>
     /// <param name="guildId"></param>
@@ -72,14 +50,16 @@ public partial class TagService(
     /// The found <see cref="Tag"/> or <see langword="null"/>
     /// if there are no tags or the match is ambiguous.
     /// </returns>
-    public async Task<Tag?> FindExactAsync(Snowflake guildId, string name, CancellationToken ct = default)
+    public async Task<Tag?> FindExactAsync(
+        Snowflake guildId,
+        string name,
+        CancellationToken ct = default)
     {
         var tag = await dataContext.Tags
-            .IncludeText()
-            .VisibleIn(guildId)
-            .WithExactName(name)
-            .OrderBy(x => x.Name)
-            .GetBestMatchAsync(ct);
+            .IncludeReferencedTag()
+            .WhereVisibleIn(guildId)
+            .WhereNameExactly(name)
+            .FirstOrDefaultAsync(ct);
 
         logger.LogInformation("Looking up tag with name {Name} in guild {Guild}, found {Result}",
             name, guildId, tag?.Name);
