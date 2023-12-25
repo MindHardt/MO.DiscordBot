@@ -5,7 +5,6 @@ using Data.Entities.Discord;
 using Disqord;
 using Disqord.Bot.Commands;
 using Disqord.Bot.Commands.Application;
-using Disqord.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
 
@@ -17,7 +16,7 @@ namespace Bot.Commands;
 public class StarboardCommands : DiscordApplicationGuildModuleBase
 {
     [SlashCommand("сюда"), Description("Отмечает этот канал как доску почета куда будут приходить апвоуты")]
-    public async ValueTask<IResult> SetStarboardChannel()
+    public async ValueTask<IResult> AssignStarboardChannel()
     {
         await Deferral();
 
@@ -66,6 +65,22 @@ public class StarboardCommands : DiscordApplicationGuildModuleBase
 
         return result.Success
             ? Response(DiscordResponses.SuccessfulEmbed($"Больше не отслеживаю реакцию {emoji}"))
+            : Qmmands.Results.Failure(result.Exception.Message);
+    }
+
+    [SlashCommand("отключить"), Description("Удаляет на сервере доску почета, отключая апвоуты")]
+    public async ValueTask<IResult> RemoveStarboardChannel()
+    {
+        await Deferral();
+
+        var request = new RemoveStarboardChannelRequest(Context.GuildId);
+        var result = await Context.Services
+            .GetRequiredService<RemoveStarboardChannelHandler>()
+            .HandleAsync(request, Context.CancellationToken)
+            .AsResult();
+
+        return result.Success
+            ? Response(DiscordResponses.SuccessfulEmbed($"Назначил удалил доску почета на этом сервере"))
             : Qmmands.Results.Failure(result.Exception.Message);
     }
 }

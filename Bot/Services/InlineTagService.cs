@@ -7,7 +7,6 @@ using Disqord.Gateway;
 using Disqord.Rest;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Qommon;
 
 namespace Bot.Services;
 

@@ -1,5 +1,4 @@
 ﻿using Data;
-using Data.Entities.Discord;
 using Data.Entities.Starboard;
 using Disqord;
 using Microsoft.EntityFrameworkCore;

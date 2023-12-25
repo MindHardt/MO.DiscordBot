@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Bot.Attributes;
+﻿using Bot.Attributes;
 using Data.Entities.Discord;
 using Disqord.Bot.Commands.Application;
 using Microsoft.Extensions.Caching.Memory;

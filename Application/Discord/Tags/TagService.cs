@@ -4,7 +4,6 @@ using Bogus;
 using Data;
 using Data.Entities.Discord;
 using Data.Entities.Tags;
-using Data.Projections;
 using Data.Queries;
 using Disqord;
 using Microsoft.EntityFrameworkCore;

@@ -1,5 +1,4 @@
 ﻿using Application.Accessors;
-using Bogus;
 using Data.Entities.Discord;
 using Disqord.Bot.Commands;
 using Microsoft.Extensions.DependencyInjection;

@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Data.Entities.Discord;
+﻿using Data.Entities.Discord;
 using Disqord;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
