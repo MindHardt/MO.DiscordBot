@@ -60,14 +60,12 @@ public static class TagQueries
     /// <param name="query"></param>
     /// <returns></returns>
     public static IQueryable<TagOverview> AsOverviews(this IQueryable<Tag> query) => query
-        .Select(x => new TagOverview
-        {
-            Id = x.Id,
-            Name = x.Name,
-            GuildId = x.GuildId,
-            OwnerId = x.OwnerId,
-            TagKind = x is MessageTag
+        .Select(x => new TagOverview(
+            x.Id,
+            x.Name,
+            x.GuildId,
+            x.OwnerId,
+            x is MessageTag
                 ? TagKind.Message
-                : TagKind.Alias
-        });
+                : TagKind.Alias ));
 }

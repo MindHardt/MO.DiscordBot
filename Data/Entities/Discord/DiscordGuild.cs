@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Data.Entities.Starboard;
 using Data.Entities.Tags;
 using Disqord;
 using Microsoft.EntityFrameworkCore;
@@ -6,7 +7,8 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Data.Entities.Discord;
 
-public record DiscordGuild : IEntity<DiscordGuild, DiscordGuildEntityConfiguration>, IDiscordEntity
+public record DiscordGuild :
+    IEntityTypeConfiguration<DiscordGuild>, IDiscordEntity
 {
     public const string DefaultTagPrefix = "$";
     public const int MaxTagPrefixLength = 16;
@@ -27,12 +29,14 @@ public record DiscordGuild : IEntity<DiscordGuild, DiscordGuildEntityConfigurati
     public bool InlineTagsEnabled { get; set; }
 
     public List<Tag> Tags { get; set; } = null!;
-}
+    public List<StarboardTrack> StarboardTracks { get; set; } = null!;
 
-public class DiscordGuildEntityConfiguration : IEntityTypeConfiguration<DiscordGuild>
-{
+    public Snowflake? StarboardChannelId { get; set; }
+    public List<StarboardQuote> StarboardQuotes { get; set; } = null!;
+
     public void Configure(EntityTypeBuilder<DiscordGuild> builder)
     {
+        builder.ToTable("Guilds");
         builder.HasMany(x => x.Tags)
             .WithOne(x => x.Guild)
             .HasForeignKey(x => x.GuildId)
@@ -40,6 +44,18 @@ public class DiscordGuildEntityConfiguration : IEntityTypeConfiguration<DiscordG
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.Property(x => x.TagPrefix)
-            .HasDefaultValue(DiscordGuild.DefaultTagPrefix);
+            .HasDefaultValue(DefaultTagPrefix);
+
+        builder.HasMany(x => x.StarboardTracks)
+            .WithOne(x => x.DiscordGuild)
+            .HasForeignKey(x => x.GuildId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(x => x.StarboardQuotes)
+            .WithOne(x => x.DiscordGuild)
+            .HasForeignKey(x => x.DiscordGuildId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

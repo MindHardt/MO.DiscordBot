@@ -114,6 +114,15 @@ namespace Bot {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Отправлено в.
+        /// </summary>
+        internal static string Quote_PostedIn {
+            get {
+                return ResourceManager.GetString("Quote.PostedIn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ✅ Успешно.
         /// </summary>
         internal static string Response_Successful {

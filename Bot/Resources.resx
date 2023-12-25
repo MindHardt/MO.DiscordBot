@@ -54,4 +54,7 @@
     <data name="StartedAt" xml:space="preserve">
         <value>🏁 Запущен</value>
     </data>
+    <data name="Quote.PostedIn" xml:space="preserve">
+        <value>Отправлено в</value>
+    </data>
 </root>
