@@ -6,13 +6,24 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Data.Entities.Discord;
 
-public record DiscordUser : IEntity<DiscordUser, DiscordUserEntityConfiguration>, IDiscordEntity
+public record DiscordUser :
+    IEntityTypeConfiguration<DiscordUser>, IDiscordEntity
 {
     public Snowflake Id { get; set; }
 
     public AccessLevel Access { get; set; }
 
     public List<Tag> Tags { get; set; } = null!;
+
+    public void Configure(EntityTypeBuilder<DiscordUser> builder)
+    {
+        builder.ToTable("Users");
+        builder.HasMany(x => x.Tags)
+            .WithOne(x => x.Owner)
+            .HasForeignKey(x => x.OwnerId)
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.SetNull);
+    }
 
     public enum AccessLevel : byte
     {
@@ -27,17 +38,5 @@ public record DiscordUser : IEntity<DiscordUser, DiscordUserEntityConfiguration>
 
         [Display(Name = "Администратор")]
         Administrator = 3
-    }
-}
-
-public class DiscordUserEntityConfiguration : IEntityTypeConfiguration<DiscordUser>
-{
-    public void Configure(EntityTypeBuilder<DiscordUser> builder)
-    {
-        builder.HasMany(x => x.Tags)
-            .WithOne(x => x.Owner)
-            .HasForeignKey(x => x.OwnerId)
-            .IsRequired(false)
-            .OnDelete(DeleteBehavior.SetNull);
     }
 }

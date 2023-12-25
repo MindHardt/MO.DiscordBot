@@ -1,5 +1,6 @@
 ﻿using Data;
 using Data.Entities.Discord;
+using Data.Entities.Starboard;
 using Data.Entities.Tags;
 using Disqord;
 using Disqord.Bot.Commands;
@@ -35,6 +36,7 @@ public class DiscordGuildAccessor(
     {
         Id = key,
         Tags = new List<Tag>(),
+        StarboardTracks = new List<StarboardTrack>(),
         TagPrefix = DiscordGuild.DefaultTagPrefix,
         InlineTagsEnabled = false
     };

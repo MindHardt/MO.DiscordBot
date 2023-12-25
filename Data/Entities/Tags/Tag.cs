@@ -10,7 +10,7 @@ namespace Data.Entities.Tags;
 /// <summary>
 /// Represents an abstract tag, i.e. a saved message that can be pasted again by its name.
 /// </summary>
-public abstract record Tag : IEntity<Tag, TagEntityConfiguration>
+public abstract record Tag : IEntityTypeConfiguration<Tag>
 {
     public const int MaxNameLength = 64;
     public const DiscordUser.AccessLevel TagsEditorAccessLevel = DiscordUser.AccessLevel.Helper;
@@ -38,10 +38,7 @@ public abstract record Tag : IEntity<Tag, TagEntityConfiguration>
     /// <returns></returns>
     public bool CanBeEditedBy(DiscordUser user) =>
         OwnerId == user.Id || user.Access >= TagsEditorAccessLevel;
-}
 
-public class TagEntityConfiguration : IEntityTypeConfiguration<Tag>
-{
     public void Configure(EntityTypeBuilder<Tag> builder)
     {
         builder.HasKey(x => x.Id);

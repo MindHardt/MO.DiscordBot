@@ -1,4 +1,7 @@
 ﻿using Disqord;
+using Disqord.Bot.Commands.Application;
+using Disqord.Gateway;
+using Qommon;
 
 namespace Bot;
 
@@ -62,4 +65,39 @@ public static class DiscordExtensions
         /// <example>4 минуты назад</example>
         Relative = 'R'
     }
+
+    public static string GetLink(this IMessage message) => message is IGatewayUserMessage { GuildId: not null } gatewayMsg
+        ? $"https://discord.com/channels/{gatewayMsg.GuildId.Value}/{gatewayMsg.ChannelId}/{gatewayMsg.Id}"
+        : $"https://discord.com/channels/@me/{message.ChannelId}/{message.Id}";
+
+    public static string GetChannelLink(this IDiscordApplicationGuildCommandContext context) =>
+        $"https://discord.com/channels/{context.GuildId}/{context.ChannelId}";
+
+    public static LocalMessage CreateQuote(this IMessage message) => new()
+    {
+        Embeds = new LocalEmbed[]
+        {
+            new()
+            {
+                Color = Color.DarkGoldenrod,
+                Author = new LocalEmbedAuthor
+                {
+                    IconUrl = message.Author.GetAvatarUrl(),
+                    Name = message.Author.Name
+                },
+                ImageUrl = Optional.FromNullable((message as IUserMessage)?.Attachments.FirstOrDefault()?.Url),
+                Description = message.Content,
+                Timestamp = DateTimeOffset.Now,
+                Fields = new List<LocalEmbedField>()
+                {
+                    new()
+                    {
+                        Name = Markdown.Bold(Resources.Quote_PostedIn),
+                        Value = message.GetLink(),
+                        IsInline = false
+                    }
+                }
+            }
+        }
+    };
 }
