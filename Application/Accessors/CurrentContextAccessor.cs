@@ -1,4 +1,5 @@
-﻿using Data;
+﻿using System.Diagnostics.CodeAnalysis;
+using Data;
 using Disqord.Bot.Commands;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -39,7 +40,7 @@ public abstract class CurrentContextAccessor<TEntity, TKey>(
     /// The found or created <typeparamref name="TEntity"/> or
     /// <see langword="null"/> if user is not found and
     /// <paramref name="notFoundAction"/> doesn't allow creating one or if
-    /// <see cref="CanBeAccessed"/> returns false.
+    /// <see cref="TryGetKey"/> returns false.
     /// </returns>
     public Task<TEntity?> GetAsync(
         NotFoundEntityAction notFoundAction = NotFoundEntityAction.None,
@@ -49,14 +50,13 @@ public abstract class CurrentContextAccessor<TEntity, TKey>(
     {
         context ??= commandContextAccessor.Context;
 
-        if (CanBeAccessed(context) is false)
+        if (TryGetKey(context, out TKey? key))
         {
-            logger.LogDebug("Cannot access {Type} for command {Command}", typeof(TEntity).Name, context.Command?.Name);
-            return Task.FromResult<TEntity?>(null);
+            return GetAsync(key, notFoundAction, allowCache, ct);
         }
 
-        var key = GetKey(context);
-        return GetAsync(key, notFoundAction, allowCache, ct);
+        logger.LogDebug("Cannot access {Type} for command {Command}", typeof(TEntity).Name, context.Command?.Name);
+        return Task.FromResult<TEntity?>(null);
     }
 
     /// <summary>
@@ -64,7 +64,7 @@ public abstract class CurrentContextAccessor<TEntity, TKey>(
     /// The value is cached for the lifetime of <see cref="CurrentContextAccessor{T, TKey}"/>
     /// so the consecutive calls will not lead to additional DB calls.
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="key">The primary key of <typeparamref name="TEntity"/>.</param>
     /// <param name="notFoundAction">Specifies behaviour if entity is not found in the database.</param>
     /// <param name="allowCache">
     /// Defines whether method should check for cached values.
@@ -118,18 +118,12 @@ public abstract class CurrentContextAccessor<TEntity, TKey>(
     }
 
     /// <summary>
-    /// Defines whether this <see cref="CurrentContextAccessor{TEntity, TKey}"/> can retrieve its data.
+    /// Attempts to retrieve <typeparamref name="TKey"/> from <paramref name="context"/>.
     /// </summary>
     /// <param name="context"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    public abstract bool CanBeAccessed(IDiscordCommandContext context);
-
-    /// <summary>
-    /// Gets <typeparamref name="TKey"/> used to retrieve data from <paramref name="context"/>.
-    /// </summary>
-    /// <param name="context"></param>
-    /// <returns></returns>
-    public abstract TKey GetKey(IDiscordCommandContext context);
+    public abstract bool TryGetKey(IDiscordCommandContext context, [NotNullWhen(true)] out TKey? key);
 
     /// <summary>
     /// Defines how long <typeparamref name="TEntity"/> should be persisted in <see cref="IMemoryCache"/>.
@@ -171,16 +165,16 @@ public abstract class CurrentContextAccessor<TEntity, TKey>(
 public enum NotFoundEntityAction
 {
     /// <summary>
-    /// User will not be created, if user is not found then <see langword="null"/> is returned.
+    /// Entity will not be created, if none is found then <see langword="null"/> is returned.
     /// </summary>
     None,
     /// <summary>
-    /// User is created and <see cref="DbSet{TEntity}.Add"/>ed to the <see cref="DataContext"/>,
+    /// Entity is created and <see cref="DbSet{TEntity}.Add"/>ed to the <see cref="DataContext"/>,
     /// but <see cref="DbContext.SaveChangesAsync(CancellationToken)"/> is not called and value is not cached.
     /// </summary>
     Create,
     /// <summary>
-    /// User is created and saved to the database.
+    /// Entity is created and saved to cache and database.
     /// </summary>
     Save
 }

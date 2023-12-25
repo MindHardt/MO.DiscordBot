@@ -7,6 +7,7 @@ using Disqord.Gateway;
 using Disqord.Rest;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Qommon;
 
 namespace Bot.Services;
 
@@ -30,7 +31,7 @@ public class InlineTagService(ILogger<InlineTagService> logger) : DiscordBotServ
         await using var scope = Bot.Services.CreateAsyncScope();
 
         var guildAccessor = scope.ServiceProvider.GetRequiredService<DiscordGuildAccessor>();
-        var guild = await guildAccessor.GetAsync(e.GuildId.Value);
+        var guild = await guildAccessor.GetAsync(e.GuildId.Value, NotFoundEntityAction.Create);
         if (guild is not { InlineTagsEnabled: true })
         {
             return;
@@ -55,10 +56,17 @@ public class InlineTagService(ILogger<InlineTagService> logger) : DiscordBotServ
             return;
         }
 
-        var response = new LocalMessage()
-            .WithContent(tagResult.Value.Text)
-            .WithReply(e.MessageId)
-            .WithAllowedMentions(LocalAllowedMentions.None);
+        var response = new LocalMessage
+        {
+            Content = tagResult.Value.Text,
+            AllowedMentions = LocalAllowedMentions.None,
+            Reference = new LocalMessageReference
+            {
+                MessageId = e.MessageId,
+                ChannelId = e.ChannelId,
+                GuildId = e.GuildId.Value
+            }
+        };
 
         await Bot.SendMessageAsync(e.ChannelId, response);
         await base.OnMessageReceived(e);

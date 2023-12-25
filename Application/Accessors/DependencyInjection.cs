@@ -5,8 +5,8 @@ namespace Application.Accessors;
 public static class DependencyInjection
 {
     /// <summary>
-    /// Adds various <see cref="CurrentContextAccessor{T}"/>s such as
-    /// <see cref="DiscordUserAccessor"/> and <see cref="DiscordGuildAccessor"/> to <paramref name="services"/>.
+    /// Adds various <see cref="CurrentContextAccessor{TEntity, TKey}"/>s to <paramref name="services"/>.
+    /// This includes <see cref="DiscordUserAccessor"/> and <see cref="DiscordGuildAccessor"/>.
     /// </summary>
     /// <param name="services"></param>
     /// <returns></returns>

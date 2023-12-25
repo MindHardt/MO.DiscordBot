@@ -22,11 +22,11 @@ public class DiscordGuildAccessor(
     // Guilds are associated with their bot shard so we can allow this
     protected override TimeSpan CacheExpirationPeriod => TimeSpan.FromHours(1);
 
-    public override bool CanBeAccessed(IDiscordCommandContext context)
-        => context.GuildId.HasValue;
-
-    public override Snowflake GetKey(IDiscordCommandContext context)
-        => context.GuildId!.Value;
+    public override bool TryGetKey(IDiscordCommandContext context, out Snowflake key)
+    {
+        key = context.GuildId ?? default;
+        return context.GuildId.HasValue;
+    }
 
     protected override Task<DiscordGuild?> FetchAsync(Snowflake key, DataContext dbContext, CancellationToken ct)
         => dbContext.Guilds.FirstOrDefaultAsync(x => x.Id == key, ct);
